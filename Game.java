@@ -12,12 +12,6 @@ import java.awt.Image;
 import javax.swing.*;
 import javax.swing.JPanel.*;
 import java.util.ArrayList;
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.Image;
-import javax.swing.*;
-import javax.swing.JPanel.*;
-import java.util.ArrayList;
 import java.io.*;
 import java.util.Scanner;
 import java.util.ArrayList;
@@ -45,26 +39,53 @@ public class Game extends JFrame implements ActionListener {
     	myTimer.start();
     }
     public void actionPerformed(ActionEvent evt){
+    	Object source = evt.getSource();
+    	if (source==myTimer){
+    		map.move();
+    	}
 		map.repaint();
     }
 
 }
  
-class GamePanel extends JPanel implements MouseListener, MouseMotionListener, KeyListener{                                                                                                                            {
+class GamePanel extends JPanel implements MouseListener, MouseMotionListener, KeyListener{
 	private Image background;//=new ImageIcon("Castiel.png").getImage();; 
 	private Game mainFrame;
 	private int x,y;
-	private boolean pressed;
+	private boolean keyPressed;
+	private boolean mousePressed;
+	private boolean [] keys;
 	private Person chara;
+	private static final int RIGHT=1;
+	private static final int LEFT=-1;
 	public GamePanel(Game m){
 		mainFrame=m;
 		x=0;
 		y=0;
 		chara=new Person();
 		background= new ImageIcon("Castiel.png").getImage();
+		keys = new boolean[65535];
 		addMouseListener(this);
 		addMouseMotionListener(this);
+		addKeyListener(this);
 		
+	}
+	public void move(){
+		moveChara();
+	}
+	public void moveChara(){
+		if (keys[KeyEvent.VK_LEFT]){
+			chara.changeDiection(LEFT);
+			chara.moveHor();
+		}
+		else if (keys[KeyEvent.VK_RIGHT]){
+			chara.changeDiection(RIGHT);
+			chara.moveHor();
+		}
+		if (keys[KeyEvent.VK_UP]){
+			chara.jump();
+		}
+		chara.fall();
 	}
 	public void addNotify() {
         super.addNotify();
@@ -74,16 +95,16 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
     @Override
     public void paintComponent(Graphics g){
     	g.drawImage(background,0,0,this);
-    	g.fillRect(chara.getX(),chara.getY(),10,10);
+    	g.drawImage(chara.getPic(),chara.getX(),chara.getY(),this);
     	//System.out.println(chara.getX());
     	//System.out.println(chara.getY());
     }
     
     public void mouseReleased(MouseEvent e){
-    	pressed=false;
+    	mousePressed=false;
     }
     public void mousePressed(MouseEvent e){
-    	pressed=true;
+    	mousePressed=true;
     	x=e.getX();
     	y=e.getY();
     	}
@@ -95,4 +116,15 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
     	y=e.getY();
     }
     public void mouseMoved(MouseEvent e){}
+    
+    public void keyTyped(KeyEvent e){
+    }
+    public void keyPressed(KeyEvent e){
+    	keyPressed=true;
+    	keys[e.getKeyCode()]=true;
+    }
+    public void keyReleased (KeyEvent e){
+    	keyPressed=false;
+    	keys[e.getKeyCode()]=false;
+    }
 }

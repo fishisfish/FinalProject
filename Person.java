@@ -6,13 +6,24 @@
  * @version 1.00 2015/4/28
  */
 
-
+import java.awt.*;
+import java.awt.event.*;
+import java.awt.Image;
+import javax.swing.*;
+import javax.swing.JPanel.*;
+import java.util.ArrayList;
+import java.io.*;
+import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.LinkedList;
 public class Person {
 	private int x,y;
+	private Image temp= new ImageIcon("profile.png").getImage();
 	private double vel;
 	private int direction=1;
 	private static final int RIGHT=1;
 	private static final int LEFT=-1;
+	private boolean inAir=false;
 
     public Person() {
     	x=400;
@@ -27,6 +38,23 @@ public class Person {
     	return y;
     }
     	
+    public Image getPic(){
+    	return temp;
+    }
     
-    
+    public void changeDiection(int dir){
+    	direction=dir;
+    }
+    public void moveHor(){
+    	x+=(direction*5);
+    	if (x<0){
+    		x=0;
+    	}
+    	if (x>750){
+    		x=750;
+    	}
+    }
+    public void jump(){
+    	if 
+    }
 }
