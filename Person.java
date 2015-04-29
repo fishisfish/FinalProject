@@ -29,6 +29,8 @@ public class Person {
     public Person() {
     	x=400;
     	y=500;
+    	xVel=0;
+    	yVel=0;
     }
     
     public int getX(){
@@ -43,11 +45,15 @@ public class Person {
     	return temp;
     }
     
-    public void changeDiection(int dir){
+    public void changeDir(int dir){
+    	xVel=(int)(Math.min(5,xVel+0.02));
     	direction=dir;
+    	System.out.println(direction);
     }
-    public void moveHor(){
-    	x+=(direction*5);
+    public void move(){
+    	System.out.println(xVel);
+    	x+=(xVel*direction);
+    	xVel=(int)(Math.max(0,xVel-0.00001));
     	if (x<0){
     		x=0;
     	}
@@ -68,9 +74,11 @@ public class Person {
     	}
     	if (y>=500){
     		y=500;
-    		inAir=false;
-    		System.out.println(yVel);
-    		yVel=0;
+    		yVel=(int)(yVel*(-0.3));
+    			if (yVel<1){
+    				inAir=false;
+		    		yVel=0;
+    			}
     		
     	}
     }
