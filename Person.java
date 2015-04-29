@@ -46,14 +46,14 @@ public class Person {
     }
     
     public void changeDir(int dir){
-    	xVel=(int)(Math.min(5,xVel+0.02));
+    	xVel=Math.min(5,xVel+0.2);
     	direction=dir;
     	System.out.println(direction);
     }
     public void move(){
     	System.out.println(xVel);
-    	x+=(xVel*direction);
-    	xVel=(int)(Math.max(0,xVel-0.00001));
+    	x+=(int)(xVel*direction);
+    	xVel=Math.max(0,xVel-0.1);
     	if (x<0){
     		x=0;
     	}
