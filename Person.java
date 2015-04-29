@@ -19,7 +19,8 @@ import java.util.LinkedList;
 public class Person {
 	private int x,y;
 	private Image temp= new ImageIcon("profile.png").getImage();
-	private double vel;
+	private double xVel;
+	private double yVel;
 	private int direction=1;
 	private static final int RIGHT=1;
 	private static final int LEFT=-1;
@@ -55,6 +56,22 @@ public class Person {
     	}
     }
     public void jump(){
-    	if 
+    	if (inAir==false){
+    		inAir=true;
+    		yVel=10;
+    	}
+    }
+    public void gravity(){
+    	if (yVel!=0){
+    		y=(int)(y-yVel);
+    		yVel-=0.81;
+    	}
+    	if (y>=500){
+    		y=500;
+    		inAir=false;
+    		System.out.println(yVel);
+    		yVel=0;
+    		
+    	}
     }
 }
