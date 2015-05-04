@@ -74,15 +74,19 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 		moveChara();
 	}
 	public void moveChara(){
+		chara.checkWalking(false);
 		if (keys[KeyEvent.VK_LEFT]){
+			chara.checkWalking(true);
 			chara.changeDir(LEFT);
 		}
 		else if (keys[KeyEvent.VK_RIGHT]){
+			chara.checkWalking(true);
 			chara.changeDir(RIGHT);
 		}
 		if (keys[KeyEvent.VK_UP]){
 			chara.jump();
 		}
+		
 		chara.move();
 		chara.gravity();
 	}
@@ -94,7 +98,8 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
     @Override
     public void paintComponent(Graphics g){
     	g.drawImage(background,0,0,this);
-    	g.drawImage(chara.getPic(),chara.getX(),chara.getY(),this);
+    	Image pic=chara.getPic();
+    	g.drawImage(pic,chara.getX()-(int)(pic.getWidth(null)/2),chara.getY()-(int)(pic.getHeight(null)/2),this);
     	//System.out.println(chara.getX());
     	//System.out.println(chara.getY());
     }
