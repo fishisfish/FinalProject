@@ -122,16 +122,14 @@ public class Person {
     }
     public void move(){
     	if (inAir==false){
-	    	
-	    	if (walkCount==4||walkCount==8){
-	    		x+=(int)(xVel*direction);
-	    	}
-	    	else if (walkCount==0||walkCount==5){
-	    		x+=(int)(Math.min(2,xVel)*direction);
-	    	}
-			else{
+	    	//x+=(int)(xVel*direction);
+	    	if (walkCount==0||walkCount==5){
 	    		x+=(int)(Math.min(1,xVel)*direction);
 	    	}
+	    	else {
+	    		x+=(int)(Math.min(2,xVel)*direction);
+	    	}
+			
     	}
     	else if (inAir==true&&isWalking==true){
     		x+=(int)(4*direction);
