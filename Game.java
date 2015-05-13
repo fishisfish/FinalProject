@@ -63,7 +63,7 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 		x=0;
 		y=0;
 		chara=new Person();
-		background= new ImageIcon("Castiel.png").getImage();
+		background= new ImageIcon("white.png").getImage();
 		keys = new boolean[65535];
 		addMouseListener(this);
 		addMouseMotionListener(this);
