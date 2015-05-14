@@ -51,18 +51,23 @@ public class Game extends JFrame implements ActionListener {
 class GamePanel extends JPanel implements MouseListener, MouseMotionListener, KeyListener{
 	private Image background;//=new ImageIcon("Castiel.png").getImage();; 
 	private Game mainFrame;
-	private int x,y;
+	private int mosX,mosY,ncamX,ncamY,camX,camY;
 	private boolean keyPressed;
 	private boolean mousePressed;
+	private boolean droppedCam=true;
 	private boolean [] keys;
 	private Person chara;
 	private static final int RIGHT=1;
 	private static final int LEFT=-1;
 	public GamePanel(Game m){
 		mainFrame=m;
-		x=0;
-		y=0;
+		mosX=0;
+		mosY=0;
 		chara=new Person();
+		ncamX=400;
+		ncamY=300;
+		camX=400;
+		camY=300;
 		background= new ImageIcon("white.png").getImage();
 		keys = new boolean[65535];
 		addMouseListener(this);
@@ -89,6 +94,50 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 		
 		chara.move();
 		chara.gravity();
+		if (chara.getMoved()==false){
+			ncamX=chara.getX();
+			ncamY=chara.getY();
+			if (Math.abs(camX-ncamX)>3){
+				camX+=3*chara.getDir();
+			}
+			else{
+				camX=ncamX;
+			}
+			camY=ncamY;	
+			droppedCam=true;
+		}
+		if (droppedCam==false&&Math.abs(ncamX-chara.getX())<100){
+			System.out.println("MOVE AND DROP");
+			ncamX=chara.getX();
+			ncamY=chara.getY();
+			camX=ncamX;
+			camY=ncamY;	
+			droppedCam=true;
+		}
+		if (droppedCam==true&&Math.abs(ncamX-chara.getX())>100){
+			System.out.println("RUNNING WITH CAM");
+			droppedCam=false;
+			
+		}
+		if (droppedCam==false){
+			System.out.println("MOVING CAM");
+			camX+=chara.getxMoved();
+			camY+=chara.getyMoved();
+			System.out.println(camX);
+		}
+		//System.out.println("N"+ncamX);
+		//System.out.println(camX);
+			
+	}
+	public int camAdjust(String temp,int ori){
+		if (temp=="X"){
+			return ori-camX+400;
+		}
+		
+		if (temp=="Y"){
+			return ori-camY+300;
+		}
+		return 0;
 	}
 	public void addNotify() {
         super.addNotify();
@@ -99,7 +148,10 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
     public void paintComponent(Graphics g){
     	g.drawImage(background,0,0,this);
     	Image pic=chara.getPic();
-    	g.drawImage(pic,chara.getX()-(int)(pic.getWidth(null)/2),chara.getY()-(int)(pic.getHeight(null)/2),this);
+
+    	g.drawImage(pic,camAdjust("X",chara.getX()-(int)(pic.getWidth(null)/2)),camAdjust("Y",chara.getY()-(int)(pic.getHeight(null)/2)),this);
+    	
+    	
     	//System.out.println(chara.getX());
     	//System.out.println(chara.getY());
     }
@@ -109,15 +161,15 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
     }
     public void mousePressed(MouseEvent e){
     	mousePressed=true;
-    	x=e.getX();
-    	y=e.getY();
+    	mosX=e.getX();
+    	mosY=e.getY();
     	}
     public void mouseEntered(MouseEvent e){}
     public void mouseExited(MouseEvent e){}
     public void mouseClicked(MouseEvent e){}
     public void mouseDragged(MouseEvent e){
-    	x=e.getX();
-    	y=e.getY();
+    	mosX=e.getX();
+    	mosY=e.getY();
     }
     public void mouseMoved(MouseEvent e){}
     
