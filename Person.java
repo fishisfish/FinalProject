@@ -117,25 +117,26 @@ public class Person {
     }
     
     public void changeDir(int dir){
-    	xVel=Math.min(3,xVel+0.1);
+    	xVel=Math.min(5,xVel+0.15);
     	direction=dir;
     }
     public void move(){
     	if (inAir==false){
-	    	//x+=(int)(xVel*direction);
-	    	if (walkCount==0||walkCount==5){
+    		
+	    	x+=(int)(xVel*direction);
+	    	/*if (walkCount==0||walkCount==5){
 	    		x+=(int)(Math.min(1,xVel)*direction);
 	    	}
 	    	else {
 	    		x+=(int)(Math.min(2,xVel)*direction);
-	    	}
+	    	}*/
 			
     	}
     	else if (inAir==true&&isWalking==true){
     		x+=(int)(4*direction);
     	}
     	if (isWalking==false&&xVel>0){
-    		xVel-=1;
+    		xVel-=0.2;
     	}    	
     	
     	if (x<0){
