@@ -34,7 +34,7 @@ public class Person {
 
     public Person() {
     	x=400;
-    	y=500;
+    	y=300;
     	xVel=0;
     	yVel=0;
     	walkCount=0;
@@ -78,6 +78,25 @@ public class Person {
     
     public int getY(){
     	return y;
+    }
+    public double getxVel(){
+    	return xVel;
+    }
+    public double getyVel(){
+    	return yVel;
+    }
+    public double getxMoved(){
+    	return xVel*direction;
+    }
+    public double getyMoved(){
+    	return yVel;
+    }
+    public boolean getMoved(){
+    	return isWalking;
+    }
+    
+    public int getDir(){
+    	return direction;
     }
     	
     public Image getPic(){
@@ -124,12 +143,6 @@ public class Person {
     	if (inAir==false){
     		
 	    	x+=(int)(xVel*direction);
-	    	/*if (walkCount==0||walkCount==5){
-	    		x+=(int)(Math.min(1,xVel)*direction);
-	    	}
-	    	else {
-	    		x+=(int)(Math.min(2,xVel)*direction);
-	    	}*/
 			
     	}
     	else if (inAir==true&&isWalking==true){
@@ -143,7 +156,7 @@ public class Person {
     		x=0;
     	}
     	if (x>750){
-    		x=750;
+    		x=75000;
     	}
     }
     public void jump(){
