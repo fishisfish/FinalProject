@@ -1,6 +1,6 @@
 /**
  * @Platform.java
- * 	- class information on all types of platforms besides normal and water
+ * 	- stores information on all types of platforms besides normal and water
  *
  * @Iris Chang 
  * @version 1.00 2015/5/05

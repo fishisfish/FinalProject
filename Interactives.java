@@ -16,7 +16,8 @@ public class Interactives {
 	private boolean reached = false; //for use of check points and portal only
 	private int x,y;
     public Interactives() {
+    	
     }
     
-    
+    public 
 }

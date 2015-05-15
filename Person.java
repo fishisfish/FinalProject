@@ -5,7 +5,7 @@
  * @author 
  * @version 1.00 2015/4/28
  */
-
+//You will need to add swinging to the list of motions
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.Image;
