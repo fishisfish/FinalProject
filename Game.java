@@ -64,8 +64,8 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 		mosX=0;
 		mosY=0;
 		chara=new Person();
-		ncamX=400;
-		ncamY=300;
+		//ncamX=400;
+		//ncamY=300;
 		camX=400;
 		camY=300;
 		background= new ImageIcon("white.png").getImage();
@@ -95,18 +95,26 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 		chara.move();
 		chara.gravity();
 		if (chara.getMoved()==false){
-			ncamX=chara.getX();
-			ncamY=chara.getY();
-			if (Math.abs(camX-ncamX)>3){
+			//ncamX=chara.getX();
+			//ncamY=chara.getY();
+			if (Math.abs(camX-chara.getX())>3){
+				System.out.println("CATCHING UP");
 				camX+=3*chara.getDir();
 			}
 			else{
-				camX=ncamX;
+				System.out.println("STOP");
+				camX=chara.getX();
 			}
-			camY=ncamY;	
-			droppedCam=true;
+			//camY=ncamY;	
+			//droppedCam=true;
 		}
-		if (droppedCam==false&&Math.abs(ncamX-chara.getX())<100){
+		else{
+			System.out.println("FOLLOW");
+			if (Math.abs(camX-chara.getX())>100){
+				camX+=chara.getxMoved();
+			}
+		}
+		/*if (droppedCam==false&&Math.abs(ncamX-chara.getX())<100){
 			System.out.println("MOVE AND DROP");
 			ncamX=chara.getX();
 			ncamY=chara.getY();
@@ -126,11 +134,12 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 			System.out.println(camX);
 		}
 		//System.out.println("N"+ncamX);
-		//System.out.println(camX);
+		//System.out.println(camX);*/
 			
 	}
 	public int camAdjust(String temp,int ori){
 		if (temp=="X"){
+			System.out.println(temp+"CAM"+camX);
 			return ori-camX+400;
 		}
 		
@@ -150,7 +159,7 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
     	Image pic=chara.getPic();
 
     	g.drawImage(pic,camAdjust("X",chara.getX()-(int)(pic.getWidth(null)/2)),camAdjust("Y",chara.getY()-(int)(pic.getHeight(null)/2)),this);
-    	
+    	System.out.println(camAdjust("X",chara.getX()-(int)(pic.getWidth(null)/2)));
     	
     	//System.out.println(chara.getX());
     	//System.out.println(chara.getY());
