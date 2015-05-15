@@ -155,7 +155,7 @@ public class Person {
     	if (x<0){
     		x=0;
     	}
-    	if (x>750){
+    	if (x>75000){
     		x=75000;
     	}
     }
