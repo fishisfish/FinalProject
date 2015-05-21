@@ -49,7 +49,7 @@ public class Game extends JFrame implements ActionListener {
 }
  
 class GamePanel extends JPanel implements MouseListener, MouseMotionListener, KeyListener{
-	private Image background;//=new ImageIcon("Castiel.png").getImage();; 
+	private Image background,actmap;//=new ImageIcon("Castiel.png").getImage();; 
 	private Game mainFrame;
 	private int mosX,mosY,ncamX,ncamY,camX,camY;
 	private boolean keyPressed;
@@ -69,6 +69,7 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 		camX=400;
 		camY=300;
 		background= new ImageIcon("white.png").getImage();
+		actmap= new ImageIcon("Maps/Act 1.png").getImage();
 		keys = new boolean[65535];
 		addMouseListener(this);
 		addMouseMotionListener(this);
@@ -156,6 +157,7 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
     @Override
     public void paintComponent(Graphics g){
     	g.drawImage(background,0,0,this);
+    	g.drawImage(actmap,-(camX-400),0,this);
     	Image pic=chara.getPic();
 
     	g.drawImage(pic,camAdjust("X",chara.getX()-(int)(pic.getWidth(null)/2)),camAdjust("Y",chara.getY()-(int)(pic.getHeight(null)/2)),this);
