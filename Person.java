@@ -94,7 +94,9 @@ public class Person {
     public boolean getMoved(){
     	return isWalking;
     }
-    
+    public boolean getinAir(){
+    	return inAir;
+    }
     public int getDir(){
     	return direction;
     }

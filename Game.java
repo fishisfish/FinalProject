@@ -49,7 +49,8 @@ public class Game extends JFrame implements ActionListener {
 }
  
 class GamePanel extends JPanel implements MouseListener, MouseMotionListener, KeyListener{
-	private Image background,actmap;//=new ImageIcon("Castiel.png").getImage();; 
+	private Image background;//=new ImageIcon("Castiel.png").getImage();; 
+	private Image white;
 	private Game mainFrame;
 	private int mosX,mosY,ncamX,ncamY,camX,camY;
 	private boolean keyPressed;
@@ -68,8 +69,9 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 		//ncamY=300;
 		camX=400;
 		camY=300;
-		background= new ImageIcon("white.png").getImage();
-		actmap= new ImageIcon("Maps/Act 1.png").getImage();
+		white = new ImageIcon("white.png").getImage();
+		background= new ImageIcon("Maps/Act 1.png").getImage();
+		System.out.println("dd");
 		keys = new boolean[65535];
 		addMouseListener(this);
 		addMouseMotionListener(this);
@@ -96,25 +98,54 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 		chara.move();
 		chara.gravity();
 		if (chara.getMoved()==false){
-			//ncamX=chara.getX();
-			//ncamY=chara.getY();
 			if (Math.abs(camX-chara.getX())>3){
-				System.out.println("CATCHING UP");
-				camX+=3*chara.getDir();
+				if (camX>chara.getX()){
+					camX-=2;
+				}
+				else{
+					camX+=2;
+				}
 			}
 			else{
-				System.out.println("STOP");
 				camX=chara.getX();
 			}
-			//camY=ncamY;	
-			//droppedCam=true;
 		}
+		
 		else{
-			System.out.println("FOLLOW");
-			if (Math.abs(camX-chara.getX())>100){
-				camX+=chara.getxMoved();
+			if (Math.abs(camX-chara.getX())>200){
+				if (chara.getX()>600&&chara.getDir()==1){
+						camX+=chara.getxMoved();
+					}
+				else if (chara.getX()<1400&&chara.getDir()==-1){
+						camX+=chara.getxMoved();
+				}
+				}
+			}
+		
+		camX=Math.max(400,camX);
+		camX=Math.min(1400,camX);
+		
+		if (chara.getinAir()==false){
+			if (Math.abs(camY-chara.getY())>3){
+				if (camY>chara.getY()&&camY-2>=300){
+					camY-=2;
+				}
+				else{
+					if(camY+2<=1000)
+					camY+=2;
+				}
+				
+			}
+			else{
+				camY=chara.getY();
 			}
 		}
+		else{
+			if (Math.abs(camY-chara.getY())>80){
+				camY+=chara.getyMoved();
+			} 
+		}
+		
 		/*if (droppedCam==false&&Math.abs(ncamX-chara.getX())<100){
 			System.out.println("MOVE AND DROP");
 			ncamX=chara.getX();
@@ -140,7 +171,7 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 	}
 	public int camAdjust(String temp,int ori){
 		if (temp=="X"){
-			System.out.println(temp+"CAM"+camX);
+			//System.out.println(temp+"CAM"+camX);
 			return ori-camX+400;
 		}
 		
@@ -156,12 +187,12 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
     }
     @Override
     public void paintComponent(Graphics g){
-    	g.drawImage(background,0,0,this);
-    	g.drawImage(actmap,-(camX-400),0,this);
+    	g.drawImage(white,0,0,this);
+    	g.drawImage(background,camAdjust("X",0),camAdjust("Y",0),this);
     	Image pic=chara.getPic();
 
     	g.drawImage(pic,camAdjust("X",chara.getX()-(int)(pic.getWidth(null)/2)),camAdjust("Y",chara.getY()-(int)(pic.getHeight(null)/2)),this);
-    	System.out.println(camAdjust("X",chara.getX()-(int)(pic.getWidth(null)/2)));
+    	//System.out.println(camAdjust("X",chara.getX()-(int)(pic.getWidth(null)/2)));
     	
     	//System.out.println(chara.getX());
     	//System.out.println(chara.getY());
