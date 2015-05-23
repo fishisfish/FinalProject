@@ -29,6 +29,7 @@ public class Person {
 	private static final int RIGHT=1;
 	private static final int LEFT=-1;
 	private boolean inAir=false;
+	private boolean doSome=false;
 	private boolean isWalking=false;
 	private boolean bouncing=false;
 
@@ -97,6 +98,9 @@ public class Person {
     public boolean getinAir(){
     	return inAir;
     }
+    public boolean getSome(){
+    	return doSome;
+    }
     public int getDir(){
     	return direction;
     }
@@ -112,8 +116,32 @@ public class Person {
 	    	//System.out.println(allPics.get(direction+1).get(0).get(walkCount));
 	    	return allPics.get(direction+1).get(0).get(walkCount);
 	    }
-	    if (inAir==true){
-	    	if (bouncing==false){
+	    if (inAir==true && bouncing==false){
+	    	if (doSome==true){
+	    		if (yVel<=10&&yVel>=7){
+		    		allPics.get(direction+1).get(2).get(0);
+		    	}
+		    	else if (yVel<7&&yVel>=4){
+					return allPics.get(direction+1).get(2).get(1);
+		    	}
+		    	else if (yVel<4&&yVel>=1){
+					return allPics.get(direction+1).get(2).get(2);
+		    	}
+		    	else if (yVel<1&&yVel>=-2){
+					return allPics.get(direction+1).get(2).get(3);
+		    	}
+		    	else if (yVel<-2&&yVel>=-5){
+					return allPics.get(direction+1).get(2).get(4);
+		    	}
+		    	else if (yVel<-5&&yVel>=-8){
+					return allPics.get(direction+1).get(2).get(5);
+		    	}
+		    	else if (yVel<-8){
+					return allPics.get(direction+1).get(2).get(0);
+		    	}
+	    		
+	    	}
+	    	else{
 	    	
 		    	if (yVel<=10&&yVel>=6){
 		    		allPics.get(direction+1).get(1).get(0);
@@ -161,11 +189,21 @@ public class Person {
     		x=75000;
     	}
     }
-    public void jump(){
+    public boolean jump(){
     	if (inAir==false){
     		inAir=true;
     		yVel=10;
+    		return true;
     	}
+    	return false;
+    }
+    public void some(){
+    	if (inAir==true && doSome==false){
+    		System.out.println("SOME");
+    		doSome=true;
+    		yVel=10;
+    	}
+    	
     }
     public void gravity(){
     	if (yVel!=0){
@@ -179,6 +217,7 @@ public class Person {
     			if (yVel<1){
     				inAir=false;
     				bouncing=false;
+    				doSome=false;
     				airCount=0;
 		    		yVel=0;
     			}

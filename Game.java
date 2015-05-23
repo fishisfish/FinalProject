@@ -57,6 +57,7 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 	private boolean mousePressed;
 	private boolean droppedCam=true;
 	private boolean [] keys;
+	private boolean canSome=false;
 	private Person chara;
 	private static final int RIGHT=1;
 	private static final int LEFT=-1;
@@ -92,7 +93,17 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 			chara.changeDir(RIGHT);
 		}
 		if (keys[KeyEvent.VK_UP]){
-			chara.jump();
+			boolean jumpOff=chara.jump();
+			if (jumpOff==true){
+				canSome=false;
+			}
+			if (jumpOff==false&&canSome==true){
+				canSome=false;
+				chara.some();
+			}
+		}
+		if (keys[KeyEvent.VK_UP]==false){
+			canSome=true;
 		}
 		
 		chara.move();
@@ -124,8 +135,8 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 		
 		camX=Math.max(400,camX);
 		camX=Math.min(1400,camX);
-		
-		if (chara.getinAir()==false){
+		camY=400;
+		/*if (chara.getinAir()==false){
 			if (Math.abs(camY-chara.getY())>3){
 				if (camY>chara.getY()&&camY-2>=300){
 					camY-=2;
@@ -144,29 +155,8 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 			if (Math.abs(camY-chara.getY())>80){
 				camY+=chara.getyMoved();
 			} 
-		}
-		
-		/*if (droppedCam==false&&Math.abs(ncamX-chara.getX())<100){
-			System.out.println("MOVE AND DROP");
-			ncamX=chara.getX();
-			ncamY=chara.getY();
-			camX=ncamX;
-			camY=ncamY;	
-			droppedCam=true;
-		}
-		if (droppedCam==true&&Math.abs(ncamX-chara.getX())>100){
-			System.out.println("RUNNING WITH CAM");
-			droppedCam=false;
-			
-		}
-		if (droppedCam==false){
-			System.out.println("MOVING CAM");
-			camX+=chara.getxMoved();
-			camY+=chara.getyMoved();
-			System.out.println(camX);
-		}
-		//System.out.println("N"+ncamX);
-		//System.out.println(camX);*/
+		}*/
+	
 			
 	}
 	public int camAdjust(String temp,int ori){
