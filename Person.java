@@ -20,8 +20,8 @@ public class Person {
 	private ArrayList<ArrayList<ArrayList<Image>>> allPics = new ArrayList<ArrayList<ArrayList<Image>>>();
 	private ArrayList<ArrayList<Image>> leftPics = new ArrayList<ArrayList<Image>>();
 	private ArrayList<ArrayList<Image>> rightPics = new ArrayList<ArrayList<Image>>();
-	private String [] picNames = new String []{"Walk", "Jump", "Some", "Swim", "Dead"};
-	private int [] frameTotal = new int []{0,0,0,0,0};
+	private String [] picNames = new String []{"Walk", "Jump", "Some", "Slid", "Swim", "Dead"};
+	private int [] frameTotal = new int []{0,0,0,0,0,0};
 	private Image temp= new ImageIcon("profile.png").getImage();
 	private double xVel;
 	private double yVel;
@@ -31,7 +31,11 @@ public class Person {
 	private boolean inAir=false;
 	private boolean doSome=false;
 	private boolean isWalking=false;
+	private boolean isSliding=false;
+	private boolean isCrouching=false;
 	private boolean bouncing=false;
+	private boolean gotDown=false;
+	private int slideCount=1;
 
     public Person() {
     	x=400;
@@ -43,7 +47,7 @@ public class Person {
     	makePics();
     }
     public void makePics(){
-    	for (int j=0; j<4; j++){
+    	for (int j=0; j<5; j++){
     		leftPics.add(new ArrayList<Image>());
     		rightPics.add(new ArrayList<Image>());
     	}
@@ -104,8 +108,44 @@ public class Person {
     public int getDir(){
     	return direction;
     }
+    
+    public void getUp(){
+    	
+    	if (slideCount==1){
+    		isSliding=false;
+    		isCrouching=false;
+    		gotDown=false;
+    	}
+    	else{
+    		slideCount-=1;
+    	}	
+    }
     	
     public Image getPic(){
+    	 if (isSliding==true){
+
+	    	if (slideCount<10){
+	    		
+		    	if (gotDown==false){
+		    		return allPics.get(direction+1).get(3).get((int)slideCount/5);
+		    	}
+		    	else{
+		    		if (slideCount>5){
+		    			return allPics.get(direction+1).get(3).get(3);
+		    		}
+		    		else{
+		    			return allPics.get(direction+1).get(3).get(4);
+		    		}
+		    	}
+	    	}
+	    	else{
+	    		return allPics.get(direction+1).get(3).get(2);
+	    	}
+    	}
+    	else if (isCrouching==true){
+    		return allPics.get(direction+1).get(3).get(5);
+    		
+    	}
     	if (isWalking==true&&inAir==false){
    	    	picStall+=1;
 	    	if (picStall==10){
@@ -191,6 +231,7 @@ public class Person {
     }
     public boolean jump(){
     	if (inAir==false){
+    		isCrouching=false;
     		inAir=true;
     		yVel=10;
     		return true;
@@ -204,6 +245,28 @@ public class Person {
     		yVel=10;
     	}
     	
+    }
+    
+    public void slide(){
+    	xVel=Math.max(0,xVel-0.20);
+    	if (xVel==0){
+    		isWalking=false;
+    	}
+    	if (inAir==false){
+	    	if (isWalking==true&&isCrouching==false){
+	    		slideCount=Math.min(20,slideCount+1);
+	    		isSliding=true;
+	    	}
+	    	else{
+	    		isCrouching=true;
+	    	}
+    	}
+    	
+    	if (slideCount>10){
+    		gotDown=true;
+    	}
+    	
+    	System.out.println("BLOO");
     }
     public void gravity(){
     	if (yVel!=0){

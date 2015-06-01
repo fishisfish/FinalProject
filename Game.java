@@ -102,8 +102,17 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 				chara.some();
 			}
 		}
+		else if (keys[KeyEvent.VK_DOWN]){
+			System.out.println("DOOOWNN");
+			chara.slide();
+		}
+		
 		if (keys[KeyEvent.VK_UP]==false){
 			canSome=true;
+		}
+		
+		if (keys[KeyEvent.VK_DOWN]==false){		
+			chara.getUp();
 		}
 		
 		chara.move();
