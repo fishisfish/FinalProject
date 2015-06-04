@@ -9,6 +9,8 @@
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.Image;
+import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.JPanel.*;
 import java.util.ArrayList;
@@ -49,7 +51,7 @@ public class Game extends JFrame implements ActionListener {
 }
  
 class GamePanel extends JPanel implements MouseListener, MouseMotionListener, KeyListener{
-	private Image background;//=new ImageIcon("Castiel.png").getImage();; 
+	private BufferedImage background;//=new ImageIcon("Castiel.png").getImage();; 
 	private Image white;
 	private Game mainFrame;
 	private int mosX,mosY,ncamX,ncamY,camX,camY;
@@ -71,7 +73,12 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 		camX=400;
 		camY=300;
 		white = new ImageIcon("white.png").getImage();
-		background= new ImageIcon("Maps/Act 1.png").getImage();
+		try{
+			background= ImageIO.read(new File("Maps/Act 1.png"));
+		}
+		catch(IOException e){
+			System.out.println("loading problem");
+		}
 		System.out.println("dd");
 		keys = new boolean[65535];
 		addMouseListener(this);
@@ -83,6 +90,7 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 		moveChara();
 	}
 	public void moveChara(){
+		chara.checkHit(background);
 		chara.checkWalking(false);
 		if (keys[KeyEvent.VK_LEFT]){
 			chara.checkWalking(true);
