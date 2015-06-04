@@ -11,6 +11,7 @@ import java.awt.event.*;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
+import java.awt.geom.*;
 import javax.swing.*;
 import javax.swing.JPanel.*;
 import java.util.ArrayList;
@@ -92,30 +93,53 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 	public void moveChara(){
 		chara.checkHit(background);
 		chara.checkWalking(false);
-		if (keys[KeyEvent.VK_LEFT]){
-			chara.checkWalking(true);
-			chara.changeDir(LEFT);
-		}
-		else if (keys[KeyEvent.VK_RIGHT]){
-			chara.checkWalking(true);
-			chara.changeDir(RIGHT);
-		}
-		if (keys[KeyEvent.VK_UP]){
-			boolean jumpOff=chara.jump();
-			if (jumpOff==true){
-				canSome=false;
+		if (chara.getSwim()==false){
+			if (keys[KeyEvent.VK_LEFT]){
+				chara.checkWalking(true);
+				chara.changeDir(LEFT);
 			}
-			if (jumpOff==false&&canSome==true){
-				canSome=false;
-				chara.some();
+			else if (keys[KeyEvent.VK_RIGHT]){
+				chara.checkWalking(true);
+				chara.changeDir(RIGHT);
 			}
+			if (keys[KeyEvent.VK_UP]){
+				boolean jumpOff=chara.jump();
+				if (jumpOff==true){
+					canSome=false;
+				}
+				if (jumpOff==false&&canSome==true){
+					canSome=false;
+					chara.some();
+				}
+			}
+			else if (keys[KeyEvent.VK_DOWN]){
+				chara.slide();
+			}
+			
+			if (keys[KeyEvent.VK_UP]==false){
+				canSome=true;
+			}
+			
+			if (keys[KeyEvent.VK_DOWN]==false){		
+				chara.getUp();
+			}
+			chara.move();
+			chara.gravity();
 		}
-		if (keys[KeyEvent.VK_UP]==false){
-			canSome=true;
+		else{
+			if (keys[KeyEvent.VK_LEFT]){
+				chara.swim("LEFT");
+			}
+			if (keys[KeyEvent.VK_RIGHT]){
+				chara.swim("RIGHT");
+			}
+			if (keys[KeyEvent.VK_UP]){
+				chara.swim("UP");
+			}
+			if (keys[KeyEvent.VK_DOWN]){
+				chara.swim("DOWN");
+			}	
 		}
-		
-		chara.move();
-		chara.gravity();
 		if (chara.getMoved()==false){
 			if (Math.abs(camX-chara.getX())>3){
 				if (camX>chara.getX()){
@@ -188,12 +212,19 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
     	g.drawImage(white,0,0,this);
     	g.drawImage(background,camAdjust("X",0),camAdjust("Y",0),this);
     	Image pic=chara.getPic();
-
-    	g.drawImage(pic,camAdjust("X",chara.getX()-(int)(pic.getWidth(null)/2)),camAdjust("Y",chara.getY()-(int)(pic.getHeight(null)/2)),this);
-    	//System.out.println(camAdjust("X",chara.getX()-(int)(pic.getWidth(null)/2)));
-    	
-    	//System.out.println(chara.getX());
-    	//System.out.println(chara.getY());
+    	if (chara.getSwim()==false){
+	    	g.drawImage(pic,camAdjust("X",chara.getX()-(int)(pic.getWidth(null)/2)),camAdjust("Y",chara.getY()-(int)(pic.getHeight(null)/2)),this);
+    	}
+    	else{
+    		Graphics2D g2D = (Graphics2D)g;
+			AffineTransform saveXform = g2D.getTransform();
+			AffineTransform at = new AffineTransform();
+			at.rotate(Math.toRadians((90-chara.getAn())%360),chara.getX(),chara.getY());
+			g2D.transform(at);
+			g2D.drawImage(pic,chara.getX()-(int)(pic.getWidth(null)/2),chara.getY()-(int)(pic.getHeight(null)/2),this);
+	
+			g2D.setTransform(saveXform);
+    	}
     }
     
     public void mouseReleased(MouseEvent e){
