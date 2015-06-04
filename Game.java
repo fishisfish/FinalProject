@@ -119,6 +119,7 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 			chara.gravity();
 		}
 		else{
+			chara.swimSlow();
 			if (keys[KeyEvent.VK_LEFT]){
 				chara.swim("LEFT");
 			}
