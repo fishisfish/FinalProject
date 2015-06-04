@@ -33,7 +33,7 @@ public class Person {
 	private boolean isWalking=false;
 	private boolean isSliding=false;
 	private boolean isCrouching=false;
-	private boolean isSwimming=true;
+	private boolean isSwimming=false;
 	
 	private boolean bouncing=false;
 	private boolean gotDown=false;
