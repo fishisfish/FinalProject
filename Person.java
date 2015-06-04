@@ -6,9 +6,14 @@
  * @version 1.00 2015/4/28
  */
 //You will need to add swinging to the list of motions
+
+//load map as bufferedImage
+
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.awt.Color;
 import javax.swing.*;
 import javax.swing.JPanel.*;
 import java.io.*;
@@ -33,15 +38,18 @@ public class Person {
 	private boolean isWalking=false;
 	private boolean isSliding=false;
 	private boolean isCrouching=false;
-	private boolean isSwimming=true;
-	
+	private boolean isSwimming=false;
 	private boolean bouncing=false;
 	private boolean gotDown=false;
 	private int slideCount=1;
 
-    public Person() {
-    	x=400;
-    	y=300;
+	private boolean runIntoWall,onGround,hitHead;
+	private int contactRecty = 42;
+	private int[][] contactPoints = {{-15,-20},{0,-20},{15,20},{-15,0},{0,0},{15,0},{-15,20},{0,20},{15,20}};
+	
+    public Person(){
+    	x=200;
+    	y=400;
     	xVel=0;
     	yVel=0;
     	jumpVel=9;
@@ -229,18 +237,20 @@ public class Person {
     	direction=dir;
     }
     public void move(){
-    	if (inAir==false){
-    		
+    	if (inAir==false && runIntoWall == false){	//moving in general
 	    	x+=(int)(xVel*direction);
-			
     	}
-    	else if (inAir==true&&isWalking==true){
+    	else if (inAir==true&&isWalking==true&&runIntoWall==false){	//moving in air
     		x+=(int)(4*direction);
     	}
-    	if (isWalking==false&&xVel>0){
+    	if (isWalking==false&&xVel>0&&runIntoWall == false){	//sliding
     		xVel-=0.2;
-    	}    	
-    	
+    	}
+    	if (inAir){	//falling
+    		
+			
+    	}
+    	//temporary
     	if (x<0){
     		x=0;
     	}
@@ -285,11 +295,11 @@ public class Person {
     	}
     }
     public void gravity(){
-    	if (yVel!=0){
+    	if (yVel!=0 && onGround == false){
     		y=(int)(y-yVel);
     		yVel-=0.55;
     	}
-    	if (y>=500){
+    	if (y>=500 || hitHead == true){	//check collide
     		y=500;
     		yVel=(int)(yVel*(-0.3));
     		bouncing=true;
@@ -332,7 +342,47 @@ public class Person {
     public void checkWalking(boolean temp){
     	isWalking=temp;
     }
-    public void checkHit(){
+    public void checkHit(BufferedImage map){
+    	//starting in top left corner and going horizontally to right, start on left again in next row (9 points total)
+    	boolean[] hits = new boolean[9];
+    	runIntoWall = false;
+    	onGround = false;
+    	hitHead = false;
+    	for (int i=0;i<9;i++){
+    		Color colour = new Color (map.getRGB(Math.max(x+contactPoints[i][0],0),Math.max(y+contactPoints[i][1],0)));
+    		hits[i] = colour.equals(Color.GREEN)?true:false;
+    		if (hits[i] == true){
+    			if(direction == RIGHT){
+    				if (i == 2 || i == 5){
+    					runIntoWall = true;
+    				}
+    			}
+    			else if(direction == LEFT){
+    				if (i == 0 || i == 3){
+    					runIntoWall = true;
+    				}
+    			}
+    			if (i==7){
+    				System.out.println("onground");
+    				onGround = true;
+    			}
+    			if (i == 1){
+    				System.out.println("hitHead");
+    				hitHead = true;
+    			}
+    			else{
+    				System.out.println("not onground");
+    			}
+    		}
+    	}
+    }
+    /*public boolean checkHor(){
+    //checks collision in the horizontal
     	
     }
+    public boolean offGround(){
+    //checks collision in the vertical
+    	
+    }*/
+
 }
