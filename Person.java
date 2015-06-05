@@ -43,14 +43,14 @@ public class Person {
     private boolean hitHead=false;
 	private int slideCount=1;
 	private int contactRecty = 42;
- 	private int[][] contactPoints = {{0,-25},{-15,-25},{15,-25},{-15,0},{0,0},{15,0},{0,22},{-15,21},{15,21}};
+ 	private int[][] contactPoints = {{0,-25},{-15,-24},{15,-24},{-15,0},{0,0},{15,0},{0,22},{-15,21},{15,21}};
 	
     public Person(){
      	x=200;
      	y=490;
     	xVel=0;
     	yVel=0;
-    	jumpVel=9;
+    	jumpVel=12;
     	headAngle=0;
     	walkCount=0;
     	picStall=0;
@@ -267,7 +267,7 @@ public class Person {
     	if (inAir==true && doSome==false){
     		System.out.println("SOMMMMMMMMMMMMME");
     		doSome=true;
-    		yVel=jumpVel;
+    		//yVel=jumpVel;
     	}	
     }
     
@@ -389,19 +389,7 @@ public class Person {
 							int j=0;
     						while (true){
     							int temp=x-j;
-    							//System.out.println("X-J"+temp+", "+tempY);
-    							//System.out.println(new Color (map.getRGB(x-j,tempY)));
     							Color c3= new Color (map.getRGB(x-j,tempY));
-    							/*Color c3;
-    							if (hitGround==false){
-    								//System.out.println("NOTGROUND");
-    								c3= new Color (map.getRGB(x-j,tempY));
-    							}
-    							else{
-    								//System.out.println("GROUND");
-    								c3= new Color (map.getRGB(x-j,y));
-    							}*/
-    							
     							if (c3.equals(Color.GREEN)==true){
     								System.out.println(j);
     								System.out.println("BEFORE:   "+x+","+y);
