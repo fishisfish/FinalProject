@@ -9,8 +9,6 @@
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.Image;
-import java.awt.image.BufferedImage;
-import javax.imageio.ImageIO;
 import java.awt.geom.*;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
@@ -77,7 +75,7 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 		camY=300;
 		white = new ImageIcon("white.png").getImage();
 		try{
-			background= ImageIO.read(new File("Maps/Act 1-1.png"));
+			background= ImageIO.read(new File("Maps/Act 1.png"));
 		}
 		catch(IOException e){
 			System.out.println("loading problem");
@@ -94,7 +92,6 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 		moveChara();
 	}
 	public void moveChara(){
-		chara.checkHit(background);
 		chara.checkWalking(false);
 		if (chara.getSwim()==false){
 			if (keys[KeyEvent.VK_LEFT]){

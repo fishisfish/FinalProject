@@ -32,7 +32,7 @@ public class Person {
 	private static final int LEFT=-1;
 	private boolean inAir=false;
 	private boolean doSome=false;
-	private boolean isWalking=true;
+	private boolean isWalking=false;
 	private boolean isSliding=false;
 	private boolean isCrouching=false;
 	private boolean isSwimming=false;
@@ -50,7 +50,7 @@ public class Person {
      	y=490;
     	xVel=0;
     	yVel=0;
-    	jumpVel=9;
+    	jumpVel=12;
     	headAngle=0;
     	walkCount=0;
     	picStall=0;
@@ -267,7 +267,7 @@ public class Person {
     	if (inAir==true && doSome==false){
     		System.out.println("SOMMMMMMMMMMMMME");
     		doSome=true;
-    		yVel=jumpVel;
+    		//yVel=jumpVel;
     	}	
     }
     
@@ -389,7 +389,7 @@ public class Person {
 							int j=0;
     						while (true){
     							int temp=x-j;
-    							Color c3= new Color (map.getRGB(x-j,tempY));    							
+    							Color c3= new Color (map.getRGB(x-j,tempY));
     							if (c3.equals(Color.GREEN)==true){
     								System.out.println(j);
     								System.out.println("BEFORE:   "+x+","+y);
@@ -426,12 +426,10 @@ public class Person {
     	//System.out.println(x);
     	//System.out.println(runIntoWall);
     }
-
     /*public boolean checkHor(){
     //checks collision in the horizontal
      	
      }
->>>>>>> upstream/master
     public boolean offGround(){
     //checks collision in the vertical
     	
