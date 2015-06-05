@@ -1,0 +1,1 @@
+So when I merge upstream (which is your current file), does it undo things that I've done or not?
