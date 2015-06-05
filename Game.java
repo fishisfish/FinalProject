@@ -10,6 +10,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.Image;
 import java.awt.geom.*;
+import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.JPanel.*;
 import java.util.ArrayList;
@@ -50,7 +52,7 @@ public class Game extends JFrame implements ActionListener {
 }
  
 class GamePanel extends JPanel implements MouseListener, MouseMotionListener, KeyListener{
-	private Image background;//=new ImageIcon("Castiel.png").getImage();; 
+	private BufferedImage background;//=new ImageIcon("Castiel.png").getImage();; 
 	private Image white;
 	private Game mainFrame;
 	private int mosX,mosY,ncamX,ncamY,camX,camY;
@@ -72,7 +74,12 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 		camX=400;
 		camY=300;
 		white = new ImageIcon("white.png").getImage();
-		background= new ImageIcon("Maps/Act 1.png").getImage();
+		try{
+			background= ImageIO.read(new File("Maps/Act 1.png"));
+		}
+		catch(IOException e){
+			System.out.println("loading problem");
+		}
 		System.out.println("dd");
 		keys = new boolean[65535];
 		addMouseListener(this);
@@ -81,6 +88,7 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 		
 	}
 	public void move(){
+		chara.checkHit(background);
 		moveChara();
 	}
 	public void moveChara(){
@@ -160,7 +168,7 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 		
 		camX=Math.max(400,camX);
 		camX=Math.min(1400,camX);
-		camY=400;
+		camY=450;
 		/*if (chara.getinAir()==false){
 			if (Math.abs(camY-chara.getY())>3){
 				if (camY>chara.getY()&&camY-2>=300){
@@ -206,6 +214,7 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
     	g.drawImage(background,camAdjust("X",0),camAdjust("Y",0),this);
     	Image pic=chara.getPic();
     	if (chara.getSwim()==false){
+    		g.drawRect(camAdjust("X",chara.getX()-15),camAdjust("Y",chara.getY())-25,30,45);
 	    	g.drawImage(pic,camAdjust("X",chara.getX()-(int)(pic.getWidth(null)/2)),camAdjust("Y",chara.getY()-(int)(pic.getHeight(null)/2)),this);
     	}
     	else{

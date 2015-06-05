@@ -9,6 +9,8 @@
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.awt.Color;
 import javax.swing.*;
 import javax.swing.JPanel.*;
 import java.io.*;
@@ -16,7 +18,7 @@ import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.LinkedList;
 public class Person {
-	private int x,y,walkCount,airCount,swimCount,breathCount,picStall,stopSwim, jumpVel;
+	private int x,y,walkCount,airCount,swimCount,breathCount,picStall,stopSwim, jumpVel,levelSizeX,levelSizeY;
 	private ArrayList<ArrayList<ArrayList<Image>>> allPics = new ArrayList<ArrayList<ArrayList<Image>>>();
 	private ArrayList<ArrayList<Image>> leftPics = new ArrayList<ArrayList<Image>>();
 	private ArrayList<ArrayList<Image>> rightPics = new ArrayList<ArrayList<Image>>();
@@ -34,14 +36,18 @@ public class Person {
 	private boolean isSliding=false;
 	private boolean isCrouching=false;
 	private boolean isSwimming=false;
-	
 	private boolean bouncing=false;
 	private boolean gotDown=false;
+    private boolean runIntoWall=false;
+    private boolean hitGround=false;
+    private boolean hitHead=false;
 	private int slideCount=1;
-
-    public Person() {
-    	x=400;
-    	y=300;
+	private int contactRecty = 42;
+ 	private int[][] contactPoints = {{0,-25},{-15,-25},{15,-25},{-15,0},{0,0},{15,0},{0,22},{-15,21},{15,21}};
+	
+    public Person(){
+     	x=200;
+     	y=490;
     	xVel=0;
     	yVel=0;
     	jumpVel=9;
@@ -49,6 +55,9 @@ public class Person {
     	walkCount=0;
     	picStall=0;
     	makePics();
+    	levelSizeX=2000;
+    	levelSizeY=1000;
+    		
     }
     public void makePics(){
     	for (int j=0; j<5; j++){
@@ -167,7 +176,7 @@ public class Person {
     		return allPics.get(direction+1).get(3).get(5);
     		
     	}
-    	if (inAir==false&&xVel>0){
+    	if (inAir==false&&xVel>0&&isWalking==true){
    	    	picStall+=1;
 	    	if (picStall==10){
 	    		walkCount=(walkCount+1)%10;
@@ -229,40 +238,37 @@ public class Person {
     	direction=dir;
     }
     public void move(){
-    	if (inAir==false){
-    		
+    	if (inAir==false && runIntoWall == false){
 	    	x+=(int)(xVel*direction);
-			
     	}
-    	else if (inAir==true&&isWalking==true){
+    	
+    	else if (inAir==true&&isWalking==true&&runIntoWall==false){
     		x+=(int)(4*direction);
     	}
-    	if (isWalking==false&&xVel>0){
+    	if (isWalking==false&&xVel>0){//&&runIntoWall == false){
     		xVel-=0.2;
+    	}
+    	if (inAir){	//falling	
     	}    	
-    	
-    	if (x<0){
-    		x=0;
-    	}
-    	if (x>75000){
-    		x=75000;
-    	}
     }
     public boolean jump(){
+    	
     	if (inAir==false){
+    		System.out.println("JUMP");
     		isCrouching=false;
     		inAir=true;
     		yVel=jumpVel;
     		return true;
     	}
+    	//System.out.println("INAIRALREADY");
     	return false;
     }
     public void some(){
     	if (inAir==true && doSome==false){
+    		System.out.println("SOMMMMMMMMMMMMME");
     		doSome=true;
     		yVel=jumpVel;
-    	}
-    	
+    	}	
     }
     
     public void slide(){
@@ -285,23 +291,21 @@ public class Person {
     	}
     }
     public void gravity(){
-    	if (yVel!=0){
-    		y=(int)(y-yVel);
-    		yVel-=0.55;
-    	}
-    	if (y>=500){
-    		y=500;
-    		yVel=(int)(yVel*(-0.3));
-    		bouncing=true;
-    			if (yVel<1){
-    				inAir=false;
-    				bouncing=false;
-    				doSome=false;
-    				airCount=0;
-		    		yVel=0;
-    			}
+    	if (inAir == true){
     		
+    		System.out.println(yVel);
+    		
+    		if (yVel>0){
+    			yVel-=0.55;
+    		}
+    		else if (yVel==0&&hitHead==true){
+    			y+=1;
+    		}
+    		else{
+    			yVel=Math.max(-10,yVel-0.55);
+    		}
     	}
+    	y=(int)(y-yVel);
     }
     public void swim (String temp){
     	sVel=Math.min(10,sVel+0.30);
@@ -332,7 +336,115 @@ public class Person {
     public void checkWalking(boolean temp){
     	isWalking=temp;
     }
-    public void checkHit(){
+    public void checkHit(BufferedImage map){
+    	//starting in top left corner and going horizontally to right, start on left again in next row (9 points total)
+    	boolean[] hits = new boolean[9];
+    	runIntoWall = false;
+    	hitHead = false;
+    	hitGround=false;
+		//System.out.println("IS walking: "+isWalking);
+    	for (int i=0;i<9;i++){
+    		int tempX=(int)(x+contactPoints[i][0]+xVel*direction);
+    		int tempY=(int)(y+contactPoints[i][1]+yVel);
     	
+    		if (tempX>=0&&tempX<=levelSizeX&&tempY>=0&&tempY<=levelSizeY){
+    			Color c = new Color (map.getRGB(tempX,tempY));
+    			if (i==6){
+    					if (c.equals(Color.GREEN)==false){
+    						inAir=true;
+    					}
+    			}
+    			if (c.equals(Color.GREEN)==true){
+    				if (i==0){
+    					hitHead=true;
+    					yVel=0;
+    					int j=0;
+    					while (true){
+    						Color c1= new Color (map.getRGB(tempX,y-j));
+    						if (c1.equals(Color.GREEN)==true){
+    							y=y-j+26;
+    							break;
+    						}
+    						j+=1;
+    					}
+    				}
+    				if (i==6&&inAir==true){
+    					inAir=false;
+    					doSome=false;
+    					yVel=0;
+    					hitGround=true;
+    					airCount=0;
+    					int j=0;
+    					while (true){
+    						Color c2= new Color (map.getRGB(tempX,y+j));
+    						if (c2.equals(Color.GREEN)==true){
+    							y=y-22+j;
+    							break;
+    						}
+    						j+=1;
+    					}
+    				}
+					if (direction==LEFT){
+						if (i==1||i==3||i==7){
+							int j=0;
+    						while (true){
+    							int temp=x-j;
+    							//System.out.println("X-J"+temp+", "+tempY);
+    							//System.out.println(new Color (map.getRGB(x-j,tempY)));
+    							Color c3= new Color (map.getRGB(x-j,tempY));
+    							/*Color c3;
+    							if (hitGround==false){
+    								//System.out.println("NOTGROUND");
+    								c3= new Color (map.getRGB(x-j,tempY));
+    							}
+    							else{
+    								//System.out.println("GROUND");
+    								c3= new Color (map.getRGB(x-j,y));
+    							}*/
+    							
+    							if (c3.equals(Color.GREEN)==true){
+    								System.out.println(j);
+    								System.out.println("BEFORE:   "+x+","+y);
+    								x=x-j+14;
+    								System.out.println("AFTER:   "+x+","+y);
+    								
+       								break;
+    							}
+    							j+=1;
+    						}
+							runIntoWall=true;
+						}
+					}
+					if (direction==RIGHT){
+						if (i==2||i==5||i==8){
+							int j=0;
+    						while (true){
+    							Color c4= new Color (map.getRGB(x+j,tempY));
+    							if (c4.equals(Color.GREEN)==true){
+    								x=x-14+j;
+    								break;
+    							}
+    							j+=1;
+    						}
+							runIntoWall=true;
+						}	
+    				}
+    			}
+    			
+    		}
+    			
+    		
+    	}
+    	//System.out.println(x);
+    	//System.out.println(runIntoWall);
     }
+    /*public boolean checkHor(){
+    //checks collision in the horizontal
+     	
+     }
+    public boolean offGround(){
+    //checks collision in the vertical
+    	
+    }*/
+
 }
