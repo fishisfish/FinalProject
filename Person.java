@@ -36,10 +36,10 @@ public class Person {
 	private static final int LEFT=-1;
 	private boolean inAir=false;
 	private boolean doSome=false;
-	private boolean isWalking=false;
+	private boolean isWalking=true;
 	private boolean isSliding=false;
 	private boolean isCrouching=false;
-	private boolean isSwimming=true;
+	private boolean isSwimming=false;
 	private boolean gotDown=false;
 	private int slideCount=1;
 	private boolean bouncing=false;
@@ -49,7 +49,7 @@ public class Person {
 	
     public Person(){
     	x=200;
-    	y=400;
+    	y=450;
     	xVel=0;
     	yVel=0;
     	headAngle=90;
@@ -298,8 +298,9 @@ public class Person {
     		y=(int)(y-yVel);
     		yVel-=0.55;
     	}
-    	if (y>=500 || hitHead == true){	//check collide
-    		y=500;
+    	if (y>=500){	//check collide
+    		yVel = 0;
+    		y=(int)(y-yVel);
     		yVel=(int)(yVel*(-0.3));
     		bouncing=true;
     			if (yVel<1){
@@ -310,6 +311,19 @@ public class Person {
 		    		yVel=0;
     			}
     		
+    	}
+    	if (hitHead == true){
+    		yVel = 0;
+    		y = (int)(y-yVel);
+    		yVel=(int)(yVel*(-0.3));
+    		bouncing=true;
+    			if (yVel<1){
+    				inAir=false;
+    				bouncing=false;
+    				doSome=false;
+    				airCount=0;
+		    		yVel=0;
+    			}
     	}
     }
     public void swim (String temp){
@@ -356,7 +370,7 @@ public class Person {
     					runIntoWall = true;
     				}
     			}
-    			else if(direction == LEFT){
+    			if(direction == LEFT){
     				if (i == 0 || i == 3){
     					runIntoWall = true;
     				}
@@ -368,9 +382,6 @@ public class Person {
     			if (i == 1){
     				System.out.println("hitHead");
     				hitHead = true;
-    			}
-    			else{
-    				System.out.println("not onground");
     			}
     		}
     	}
