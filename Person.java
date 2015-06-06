@@ -32,6 +32,7 @@ public class Person {
 	private int slideCount=1;
 	private int contactRecty = 42;
 	private int apex;
+	private int lastWallx;
 	private static final int RIGHT=1;
 	private static final int LEFT=-1;
 	private boolean inAir=false;
@@ -50,8 +51,12 @@ public class Person {
     private boolean propel=false;
     private boolean leavingWater=false;
     private boolean hitApex=true;
+    private boolean[] WallHits = new boolean[9];
  	private int[][] contactPoints = {{0,-25},{-15,-24},{15,-24},{-15,0},{0,0},{15,0},{0,22},{-15,21},{15,21}};
-	private Color BLUE = new Color (0,165,255);
+ 	private int[][] rotatedPoints = {{0,-25},{-15,-24},{15,-24},{-15,0},{0,0},{15,0},{0,22},{-15,21},{15,21}};
+ 	private double [] distPoints ={25.0,Math.pow(24*24+15*15,0.5),Math.pow(21*21+15*15,0.5),15.0,0,15.0,22.0,Math.pow(21*21+15*15,0.5),Math.pow(21*21+15*15,0.5)};
+ 	private double [] cptStartAngles={Math.toRadians(90)+Math.atan(15/21), Math.toRadians(180)+Math.atan(24/15),Math.toRadians(270)+Math.atan(24/15),Math.toRadians(180),-10000,0,Math.toRadians(90),Math.toRadians(90)+Math.atan(15/21),Math.atan(21/15)};	
+ 	private Color BLUE = new Color (0,165,255);
 	private Color PURPLE = new Color (200,0,200);
 	private Color ORANGE = new Color (255,156,0);
     public Person(){
@@ -59,7 +64,7 @@ public class Person {
      	y=490;
     	xVel=0;
     	yVel=0;
-    	jumpVel=10;
+    	jumpVel=11;
     	propelVel=12;
     	headAngle=90;
     	walkCount=0;
@@ -165,6 +170,9 @@ public class Person {
    	}
     public boolean getleavingWater(){
     	return leavingWater;
+    }
+    public int [][] getPoints(){
+    	return rotatedPoints;
     }
     public Image getPic(){
     	if (isSwimming==true&&isSinking==false){
@@ -316,6 +324,7 @@ public class Person {
     	return false;
     }
     public void some(String tmp){
+
     	if (inAir==true && doSome==false){
     		//System.out.println("SOMMMMMMMMMMMMME");
     		doSome=true;
@@ -421,28 +430,55 @@ public class Person {
     		
     	}
     }
+    public boolean checkWallCling(int tmp){
+    	if (tmp==LEFT&&(WallHits[1]==true||WallHits[3]==true||WallHits[7]==true)){
+    		return true;
+    	}
+    	if (tmp==RIGHT&&(WallHits[2]==true||WallHits[5]==true||WallHits[8]==true)){
+    		return true;
+    	}
+    	else{
+    		return false;
+    	}
+    		
+    }
     public void cling(){
-    	if (inAir==true&&doSome==false){
+    	if (((direction*xVel>0&&(xVel>0&&checkWallCling(RIGHT)==true||xVel<0&&checkWallCling(LEFT)==true))||(xVel==0&&(direction==LEFT&&checkWallCling(LEFT)==true)||(direction==RIGHT&&checkWallCling(RIGHT)==true)))&&(doSome==false||doSome==true&&lastWallx!=x+15*direction)){
 			yVel=Math.min(yVel,0);
 			xVel=0;
 			isWalking=false;
 			isClinging=true;
+			doSome=false;
+			lastWallx=x+15*direction;
 			}
     }
     public void checkWalking(boolean temp){
     	isWalking=temp;
     }
+    public void rotate(){
+    	int angleRotated=headAngle-90;
+    	for (int i=0;i<9;i++){
+    		if (i!=5){
+    			double newAng=angleRotated+cptStartAngles[i];
+    			rotatedPoints[i][0]=(int)(distPoints[i]*Math.cos(newAng));
+    			rotatedPoints[i][1]=(int)(distPoints[i]*Math.sin(newAng));
+    		}
+    		
+    		
+    	}
+    }
     public void checkHit(BufferedImage map){
     	//System.out.println(y);
     	//starting in top left corner and going horizontally to right, start on left again in next row (9 points total)
-    	boolean[] WallHits = new boolean[9];
+    	
     	runIntoWall = false;
     	hitHead = false;
     	hitGround=false;
     	leavingWater=false;
     	//jumpOut=false;
 		//System.out.println("IS walking: "+isWalking);
-		//System.out.println(x+","+y);
+	//	System.out.println(y);
+	//	System.out.println("INAIR: "+inAir);
     	for (int i=0;i<9;i++){
     		int tempX;
   			int tempY;
@@ -543,9 +579,7 @@ public class Person {
     							j+=1;
     						}
 							runIntoWall=true;
-							if (WallHits[6]==false){
-								cling();
-							}
+
 						}
 					}
 					if (xVel>0){
@@ -561,10 +595,6 @@ public class Person {
     							j+=1;
     						}
 							runIntoWall=true;
-							if (WallHits[6]==false){
-								cling();
-							}
-							
 						}	
     				}
     			}
@@ -574,7 +604,14 @@ public class Person {
     		
     	}
     	if (WallHits[1]==false&&WallHits[2]==false&&WallHits[3]==false&&WallHits[5]==false&&WallHits[7]==false&&WallHits[8]==false){
+    		//System.out.println("NOT-CLINGG");
     		isClinging=false;
+    	}
+    	else{
+    		if (inAir==true&&isSwimming==false){
+    		//	System.out.println("CLINGG");
+				cling();
+				}
     	}
     	//System.out.println(x);
     	//System.out.println(runIntoWall);

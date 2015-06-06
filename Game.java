@@ -156,7 +156,8 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 			}
 			if (keys[KeyEvent.VK_DOWN]){
 				chara.swim("DOWN");
-			}	
+			}
+			chara.rotate();	
 		}
 		if (chara.getMoved()==false){
 			if (Math.abs(camX-chara.getX())>3){
@@ -252,10 +253,10 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
     public void paintComponent(Graphics g){
     	g.drawImage(white,0,0,this);
     	g.drawImage(background,camAdjust("X",0),camAdjust("Y",0),this);
-    	g.drawRect(camAdjust("X",chara.getX()-15),camAdjust("Y",chara.getY())-25,30,45);
+    	
     	Image pic=chara.getPic();
     	if (chara.getSwim()==false){
-    		
+    		g.drawRect(camAdjust("X",chara.getX()-15),camAdjust("Y",chara.getY())-25,30,45);
 	    	g.drawImage(pic,camAdjust("X",chara.getX()-(int)(pic.getWidth(null)/2)),camAdjust("Y",chara.getY()-(int)(pic.getHeight(null)/2)),this);
     	}
     	else{
@@ -267,9 +268,16 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 			g2D.drawImage(pic,camAdjust("X",chara.getX()-(int)(pic.getWidth(null)/2)),camAdjust("Y",chara.getY()-(int)(pic.getHeight(null)/2)),this);
 	
 			g2D.setTransform(saveXform);
+			int [][]tmp=chara.getPoints();
+			for (int i=0;i<1;i++){
+				int [] point=tmp[i];
+				//g.drawOval(camAdjust("X",chara.getX()+point[0]-(int)(pic.getWidth(null)/2)),camAdjust("Y",chara.getY()+point[1]-(int)(pic.getHeight(null)/2)),2,2);
+				g.drawRect(camAdjust("X",chara.getX()),camAdjust("Y",chara.getY()),5,5);
+				System.out.println(chara.getX()+point[0]);
+				System.out.println(chara.getY()+point[1]);
+			}
     	}
     }
-    
     public void mouseReleased(MouseEvent e){
     	mousePressed=false;
     }
