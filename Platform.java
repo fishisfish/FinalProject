@@ -27,7 +27,7 @@ public class Platform{
 	private boolean intact = true;
 	private boolean regen;
 	private int width, length;
-	public Platform(/*data file format*/){
+	public Platform(String data){
 		/*x = data x
 		 *y = data y
 		 *type = data type
