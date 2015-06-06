@@ -61,6 +61,7 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 	private boolean droppedCam=true;
 	private boolean [] keys;
 	private boolean canSome=false;
+	boolean jumpOff;
 	private Person chara;
 	private static final int RIGHT=1;
 	private static final int LEFT=-1;
@@ -69,13 +70,11 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 		mosX=0;
 		mosY=0;
 		chara=new Person();
-		//ncamX=400;
-		//ncamY=300;
 		camX=400;
 		camY=300;
 		white = new ImageIcon("white.png").getImage();
 		try{
-			background= ImageIO.read(new File("Maps/Act 1.png"));
+			background= ImageIO.read(new File("Maps/Act 1-1.png"));
 		}
 		catch(IOException e){
 			System.out.println("loading problem");
@@ -92,6 +91,13 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 		moveChara();
 	}
 	public void moveChara(){
+		if (chara.getleavingWater()==true){
+					System.out.println("LEFTWATER");
+					canSome=false;
+					//jumpOff=false;
+		}
+		//System.out.println("CANSOME: "+canSome);
+		//System.out.println("UP-PRESSED: "+keys[KeyEvent.VK_UP]);
 		chara.checkWalking(false);
 		if (chara.getSwim()==false){
 			if (keys[KeyEvent.VK_LEFT]){
@@ -103,13 +109,19 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 				chara.changeDir(RIGHT);
 			}
 			if (keys[KeyEvent.VK_UP]){
-				boolean jumpOff=chara.jump();
+				jumpOff=chara.jump();
+				//System.out.println("JF: "+jumpOff);
 				if (jumpOff==true){
 					canSome=false;
 				}
-				if (jumpOff==false&&canSome==true){
+				if (jumpOff==false&&canSome==true&&chara.getCling()==false){
+					///System.out.println("CHANGE");
 					canSome=false;
-					chara.some();
+					chara.some("");
+				}
+				if (chara.getCling()==true&&canSome==true){
+					canSome=false;
+					chara.some("OFFWALL");
 				}
 			}
 			else if (keys[KeyEvent.VK_DOWN]){
@@ -117,6 +129,7 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 			}
 			
 			if (keys[KeyEvent.VK_UP]==false){
+				//System.out.println("CANSUM");
 				canSome=true;
 			}
 			
@@ -128,6 +141,7 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 		}
 		else{
 			chara.swimSlow();
+			chara.sink();
 			if (keys[KeyEvent.VK_LEFT]){
 				chara.swim("LEFT");
 			}
@@ -136,6 +150,9 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 			}
 			if (keys[KeyEvent.VK_UP]){
 				chara.swim("UP");
+				//System.out.println("UPPP");
+				//System.out.println("PROPEL: "+chara.getleavingWater());
+				
 			}
 			if (keys[KeyEvent.VK_DOWN]){
 				chara.swim("DOWN");
@@ -156,7 +173,7 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 		}
 		
 		else{
-			if (Math.abs(camX-chara.getX())>200){
+			if (Math.abs(camX-chara.getX())>20){
 				if (chara.getX()>600&&chara.getDir()==1){
 						camX+=chara.getxMoved();
 					}
@@ -168,27 +185,50 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 		
 		camX=Math.max(400,camX);
 		camX=Math.min(1400,camX);
-		camY=450;
-		/*if (chara.getinAir()==false){
+		if (chara.getinAir()==false){
+		//	System.out.println(camY-chara.getY());
 			if (Math.abs(camY-chara.getY())>3){
 				if (camY>chara.getY()&&camY-2>=300){
 					camY-=2;
 				}
+			
 				else{
-					if(camY+2<=1000)
+					if(camY+2<=1000){
+					//System.out.println("MOVEDOWNSLOWLY");
 					camY+=2;
+					}
 				}
 				
 			}
 			else{
+				//System.out.println("TELEPORT");
 				camY=chara.getY();
 			}
 		}
 		else{
-			if (Math.abs(camY-chara.getY())>80){
-				camY+=chara.getyMoved();
+		//	System.out.println("Y: "+chara.getY());
+		//	System.out.println("CAMY: "+camY);
+		//	System.out.println("MOVED: "+chara.getyMoved());
+			if (chara.getyMoved()>0){
+				chara.reachingApex(false);
+			}
+			if (Math.abs(camY-chara.getY())>20||chara.reachedApex()==false&&chara.getyMoved()<0){
+				if (chara.reachedApex()==false&&camY>chara.getApex()){
+			//		System.out.println("GOING UP");
+					camY+=-1*Math.abs(chara.getyMoved());
+					if (camY<=chara.getApex()){
+			//			System.out.println("APEX");
+						chara.reachingApex(true);
+					}
+				}
+					
+				else{
+					//System.out.println("OTHER");
+					camY+=-1*chara.getyMoved();
+				}
+				
 			} 
-		}*/
+		}
 	
 			
 	}
@@ -212,18 +252,19 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
     public void paintComponent(Graphics g){
     	g.drawImage(white,0,0,this);
     	g.drawImage(background,camAdjust("X",0),camAdjust("Y",0),this);
+    	g.drawRect(camAdjust("X",chara.getX()-15),camAdjust("Y",chara.getY())-25,30,45);
     	Image pic=chara.getPic();
     	if (chara.getSwim()==false){
-    		g.drawRect(camAdjust("X",chara.getX()-15),camAdjust("Y",chara.getY())-25,30,45);
+    		
 	    	g.drawImage(pic,camAdjust("X",chara.getX()-(int)(pic.getWidth(null)/2)),camAdjust("Y",chara.getY()-(int)(pic.getHeight(null)/2)),this);
     	}
     	else{
     		Graphics2D g2D = (Graphics2D)g;
 			AffineTransform saveXform = g2D.getTransform();
 			AffineTransform at = new AffineTransform();
-			at.rotate(Math.toRadians((90-chara.getAn())%360),chara.getX(),chara.getY());
+			at.rotate(Math.toRadians((90-chara.getAn())%360),camAdjust("X",chara.getX()),camAdjust("Y",chara.getY()));
 			g2D.transform(at);
-			g2D.drawImage(pic,chara.getX()-(int)(pic.getWidth(null)/2),chara.getY()-(int)(pic.getHeight(null)/2),this);
+			g2D.drawImage(pic,camAdjust("X",chara.getX()-(int)(pic.getWidth(null)/2)),camAdjust("Y",chara.getY()-(int)(pic.getHeight(null)/2)),this);
 	
 			g2D.setTransform(saveXform);
     	}
