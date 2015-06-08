@@ -305,7 +305,7 @@ public class Person {
     	}
     	if (inAir==true){
     			System.out.println("DIR: "+direction);
-    			System.out.println("XVEL: "+xVel);
+    			System.out.println("XmVEL: "+xVel);
     			if (direction*xVel<0){
     				System.out.println("ORI: "+xVel);
     				xVel*=-1;
