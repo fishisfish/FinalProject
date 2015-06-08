@@ -59,7 +59,7 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 	private boolean droppedCam=true;
 	private boolean [] keys;
 	private boolean canSome=false;
-	boolean jumpOff;
+	private boolean jumpOff;
 	private Person chara;
 	private Level level;
 	private static final int RIGHT=1;
@@ -69,7 +69,7 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 		mosX=0;
 		mosY=0;
 		chara=new Person();
-		int lev = chooseLevel(); //chooseLevel();
+		int lev = 1; //chooseLevel();
 		level = new Level(lev);
 		chara.setX(level.getDropx());
 		chara.setY(level.getDropy());
@@ -147,19 +147,19 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 			chara.swimSlow();
 			chara.sink();
 			if (keys[KeyEvent.VK_LEFT]){
-				chara.swim("LEFT");
+				chara.swim("LEFT", level.getMap());
 			}
 			if (keys[KeyEvent.VK_RIGHT]){
-				chara.swim("RIGHT");
+				chara.swim("RIGHT", level.getMap());
 			}
 			if (keys[KeyEvent.VK_UP]){
-				chara.swim("UP");
+				chara.swim("UP", level.getMap());
 				//System.out.println("UPPP");
 				//System.out.println("PROPEL: "+chara.getleavingWater());
 				
 			}
 			if (keys[KeyEvent.VK_DOWN]){
-				chara.swim("DOWN");
+				chara.swim("DOWNn", level.getMap());
 			}
 			chara.rotate();	
 		}
@@ -191,15 +191,15 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 		camX=Math.max(400,camX);
 		camX=Math.min(1400,camX);
 		if (chara.getinAir()==false){
-		//	System.out.println(camY-chara.getY());
+			System.out.println(camY-chara.getY());
 			if (Math.abs(camY-chara.getY())>3){
 				if (camY>chara.getY()&&camY-2>=300){
 					camY-=2;
 				}
 			
 				else{
-					if(camY+2<=1000){
-					//System.out.println("MOVEDOWNSLOWLY");
+					if(camY<chara.getY()&&camY+2<=1000){
+					System.out.println("MOVEDOWNSLOWLY");
 					camY+=2;
 					}
 				}
@@ -228,12 +228,14 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 				}
 					
 				else{
-					//System.out.println("OTHER");
+					System.out.println("OTHER");
 					camY+=-1*chara.getyMoved();
 				}
 				
 			} 
 		}
+		camY=Math.max(300,camY);
+		camY=Math.min(2000,camY);
 	
 			
 	}
@@ -279,14 +281,15 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 			g2D.drawImage(pic,camAdjust("X",chara.getX()-(int)(pic.getWidth(null)/2)),camAdjust("Y",chara.getY()-(int)(pic.getHeight(null)/2)),this);
 	
 			g2D.setTransform(saveXform);
-			int [][]tmp=chara.getPoints();
-			for (int i=0;i<1;i++){
-				int [] point=tmp[i];
-				//g.drawOval(camAdjust("X",chara.getX()+point[0]-(int)(pic.getWidth(null)/2)),camAdjust("Y",chara.getY()+point[1]-(int)(pic.getHeight(null)/2)),2,2);
-				g.drawRect(camAdjust("X",chara.getX()),camAdjust("Y",chara.getY()),5,5);
-				System.out.println(chara.getX()+point[0]);
-				System.out.println(chara.getY()+point[1]);
-			}
+			//g.drawRect(camAdjust("X",chara.getX()-15),camAdjust("Y",chara.getY())-25,30,45);
+	    	
+			//int [][]tmp=chara.getPoints();
+			//for (int i=0;i<9;i++){
+				//int [] point=tmp[i];
+				//g.drawOval(camAdjust("X",chara.getX()+point[0]),camAdjust("Y",chara.getY()+point[1]),2,2);
+			//	System.out.println(point[0]);
+			//	System.out.println(point[1]);
+			//}
     	}
     }
     public void mouseReleased(MouseEvent e){

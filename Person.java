@@ -51,14 +51,23 @@ public class Person {
     private boolean propel=false;
     private boolean leavingWater=false;
     private boolean hitApex=true;
+    private boolean canRight=true;
+    private boolean canLeft=true;
+    private boolean tooRight=false;
+    private boolean tooLeft=false;
+    private boolean tooUp=false;
+    private boolean tooDown=false;
     private boolean[] WallHits = new boolean[9];
+    private boolean [] wallHitinWater = new boolean [9];
+    private int [] waterHits = new int [9];
  	private int[][] contactPoints = {{0,-25},{-15,-24},{15,-24},{-15,0},{0,0},{15,0},{0,22},{-15,21},{15,21}};
- 	private int[][] rotatedPoints = {{0,-25},{-15,-24},{15,-24},{-15,0},{0,0},{15,0},{0,22},{-15,21},{15,21}};
- 	private double [] distPoints ={25.0,Math.pow(24*24+15*15,0.5),Math.pow(21*21+15*15,0.5),15.0,0,15.0,22.0,Math.pow(21*21+15*15,0.5),Math.pow(21*21+15*15,0.5)};
- 	private double [] cptStartAngles={Math.toRadians(90)+Math.atan(15/21), Math.toRadians(180)+Math.atan(24/15),Math.toRadians(270)+Math.atan(24/15),Math.toRadians(180),-10000,0,Math.toRadians(90),Math.toRadians(90)+Math.atan(15/21),Math.atan(21/15)};	
+ 	private int[][] rotatedPoints = {{0,-23},{-13,-22},{10,-22},{-13,0},{0,0},{10,0},{0,22},{-13,21},{10,21}};
+ 	private double [] distPoints ={23.0,Math.pow(22*22+13*13,0.5),Math.pow(22*22+10*10,0.5),13.0,0.0,10.0,22.0,Math.pow(21*21+13*13,0.5),Math.pow(21*21+10*10,0.5)};
+ 	private double [] cptStartAngles={Math.toRadians(90),Math.toRadians(90)+Math.atan(13.0/22.0),Math.atan(22.0/10.0),Math.toRadians(180),-10000,0,Math.toRadians(270),Math.toRadians(180)+Math.atan(21.0/13.0),Math.toRadians(270)+Math.atan(10.0/21.0)};	
  	private Color BLUE = new Color (0,165,255);
 	private Color PURPLE = new Color (200,0,200);
 	private Color ORANGE = new Color (255,156,0);
+	private Color footColor;
     public Person(){
     	xVel=0;
     	yVel=0;
@@ -294,21 +303,30 @@ public class Person {
     	else if (inAir==true&&isWalking==true&&runIntoWall==false){
     		x+=(int)(4*direction);
     	}
-    	if (isWalking==false&&Math.abs(xVel)>0){
-
-    		double tmp=xVel+direction*-1*slideCoefficient;
-    		if (tmp*xVel<0){
-    			xVel=0;
-    		}
-    		else{
-    			xVel=tmp;
-    		}
+    	if (inAir==true){
+    			System.out.println("DIR: "+direction);
+    			System.out.println("XmVEL: "+xVel);
+    			if (direction*xVel<0){
+    				System.out.println("ORI: "+xVel);
+    				xVel*=-1;
+    				System.out.println("NEW: "+xVel);
+    			}
     	}
-    	if (inAir){	//falling	
-    	}    	
+    	else if (isWalking==false&&Math.abs(xVel)>0){
+				double tmp=xVel+direction*-1*slideCoefficient;
+	    		if (tmp*xVel<0){
+	    			xVel=0;
+	    		}
+	    		else{
+	    			xVel=tmp;
+	    		}
+			
+    		
+    		
+    	}	
     }
     public boolean jump(){
-    	//System.out.println("JUMP FUNCTION CALLED. AAAA");
+    	System.out.println("JUMP FUNCTION CALLED. AAAA");
     	if (inAir==false){
     		System.out.println("JUMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMP");
     		isCrouching=false;
@@ -328,7 +346,7 @@ public class Person {
     	return false;
     }
     public void some(String tmp){
-
+		System.out.println("SOMECALLED");
     	if (inAir==true && doSome==false){
     		//System.out.println("SOMMMMMMMMMMMMME");
     		doSome=true;
@@ -340,6 +358,7 @@ public class Person {
     }
     
     public void slide(){
+    	System.out.println("SLIDE");
     	double tmp=xVel+direction*0.2*-1;
     	if (tmp*xVel<=0||direction*xVel<=0){
     		xVel=0;
@@ -365,10 +384,9 @@ public class Person {
     	}
     }
     public void gravity(){
+    //	System.out.println("GRAVITY");
     	if (inAir == true){
-    		
-    		//System.out.println("FALL");
-    		
+    	//	System.out.println("FALL");
     		if (yVel>0){
     			if(isClinging==false){
     				yVel-=0.55;
@@ -393,35 +411,65 @@ public class Person {
     			}
     		}
     	}
+    	//System.out.println("VE:: "+yVel);
     	y=(int)(y-yVel);
+   
     	if (y<apex){
     		apex=y;
     		hitApex=false;
     	}
     }
-    public void swim (String temp){
+    public void swim (String temp, BufferedImage map){
+    	//System.out.println("SWIIMM");
+    	double ang=Math.toRadians(headAngle);
     	sVel=Math.min(10,sVel+0.30);
     	stopSwim=1;
+    	
     	if (temp=="LEFT"){
-    		
-    		headAngle=(headAngle+1)%360;
+    		if (canLeft==true){
+    			headAngle=(headAngle+1)%360;
+    		}
+    		/*else{
+    		/*if 
+    			if (canSwim(ang,swimDir*-1,map)==true){
+    				x=x+(int)(3*Math.cos(ang)*swimDir*-1);
+    				y=y-(int)(3*Math.sin(ang)*swimDir*-1);
+    			}
+
+    		}*/
     	}
     	else if (temp=="RIGHT"){
-    		headAngle=(360+headAngle-1)%360;
+    		if (canRight==true){
+    			headAngle=(360+headAngle-1)%360;
+    		}
+    		/*else{
+    			if (canSwim(ang,swimDir*-1,map)==true){
+    				x=x+(int)(3*Math.cos(ang)*swimDir*-1);
+    				y=y-(int)(3*Math.sin(ang)*swimDir*-1);
+    			}
+
+    		}*/
     	}
     	else{
-    		double ang=Math.toRadians(headAngle);
     		if (temp=="UP"){
-    			x=x+(int)(3*Math.cos(ang));
-    			y=y-(int)(3*Math.sin(ang));
+    			if (canSwim(ang, 1, map)==true){
+    				x=x+(int)(3*Math.cos(ang));
+    				y=y-(int)(3*Math.sin(ang));
+    				//System.out.println("UP");
+    			}
+    			
     			swimDir=1;
     		}
     		if (temp=="DOWN"){
-    			x=x-(int)(3*Math.cos(ang));
-    			y=y+(int)(3*Math.sin(ang));
+    			if (canSwim(ang, -1, map)==true){
+	    			x=x-(int)(3*Math.cos(ang));
+	    			y=y+(int)(3*Math.sin(ang));
+	    			System.out.println("DOWN");
+    			}
     			swimDir=-1; 
     		}
     	}
+    	
     }
     public void swimSlow(){
     	sVel=Math.max(0,sVel-0.20);
@@ -462,14 +510,54 @@ public class Person {
     public void rotate(){
     	int angleRotated=headAngle-90;
     	for (int i=0;i<9;i++){
-    		if (i!=5){
-    			double newAng=angleRotated+cptStartAngles[i];
-    			rotatedPoints[i][0]=(int)(distPoints[i]*Math.cos(newAng));
-    			rotatedPoints[i][1]=(int)(distPoints[i]*Math.sin(newAng));
-    		}
-    		
-    		
+    		if (i!=4){
+    			double newAng=Math.toRadians(angleRotated)+cptStartAngles[i];
+    			rotatedPoints[i][0]=(int)Math.round(distPoints[i]*Math.cos(newAng));
+    			rotatedPoints[i][1]=(int)Math.round(distPoints[i]*-1*Math.sin(newAng));
+    		}			
     	}
+    }
+    public int [] rotateTest(double An, int i){
+    	double angleRotated=An-(Math.PI/2);
+    	double newAng=angleRotated+cptStartAngles[i];
+    	int a=(int)Math.round(distPoints[i]*Math.cos(newAng));
+    	int b=(int)Math.round(distPoints[i]*-1*Math.sin(newAng));
+    	int [] tmp={a,b};
+    	return tmp;			
+    	
+    }
+    public int add(int [] tmp){
+    	int sum=0;
+    	for (int i: tmp){
+    		sum+=i;
+    	}
+    	return sum;
+    }
+    public boolean canSwim(double An, int dir, BufferedImage map){
+    	System.out.println("TEST");
+    	int tempX=x+(int)(3*Math.cos(An)*dir);
+    	int tempY=y-(int)(3*Math.sin(An)*dir);
+    	for (int i=0;i<9;i++){
+    		int [] tmp= rotatedPoints[i];
+    		Color c = new Color (map.getRGB(tempX+tmp[0],tempY+tmp[1]));
+    		if (c.equals(Color.GREEN)==true){
+    			System.out.println("ISSWIMATWALL");
+    			System.out.println(y+tmp[1]);
+    			System.out.println(y);
+    		/*	if (y+tmp[1]<=y){
+    				System.out.println("TURN-UP");
+    				headAngle+=1;
+    			}
+    			if (y+tmp[1]>y){
+    				System.out.println("TURN-DOWN");
+    				headAngle-=1;
+    			}*/
+    			System.out.println("CAN'T");
+    			return false;
+    		}
+    	}
+    	System.out.println("CANSWIM");	
+		return true;
     }
     public void checkHit(BufferedImage map){
     	//System.out.println(y);
@@ -479,143 +567,249 @@ public class Person {
     	hitHead = false;
     	hitGround=false;
     	leavingWater=false;
+    	canRight=true;
+    	canLeft=true;
+    	tooRight=false;
+    	tooLeft=false;
+    	tooUp=false;
+    	tooDown=false;
+    	int waterWallhitCount=0;
+    	for (int i=0;i<9;i++){
+			waterHits[i]=0;
+			wallHitinWater[i]=false;
+		} 
     	//jumpOut=false;
 		//System.out.println("IS walking: "+isWalking);
 	//	System.out.println(y);
 	//	System.out.println("INAIR: "+inAir);
     	for (int i=0;i<9;i++){
-    		int tempX;
-  			int tempY;
-  			
+    		int tempX,tempY,tempRx,tempRy,tempLx,tempLy;
+    		Color cS = new Color (map.getRGB(x+rotatedPoints[i][0],y+rotatedPoints[i][1]));
+			if (isSwimming==true){
+				if (cS.equals(Color.RED)==true){
+					System.out.println("DEATH");
+				}
+				else{
+				
+	    			if (cS.equals(BLUE)==true){
+	    				waterHits[i]=1;
+	    				}
+	    				
+		    		
+	    			double angR=Math.toRadians((360+headAngle-1)%360);
+	    			double angL=Math.toRadians((360+headAngle+1)%360);
+	    			tempRx=x+rotateTest(angR, i)[0];
+	    			tempRy=y+rotateTest(angR, i)[1];
+	    			tempLx=x+rotateTest(angL, i)[0];
+	    			tempLy=y+rotateTest(angL, i)[1];
+	    			
+	    			Color cR = new Color (map.getRGB(tempRx,tempRy));
+	    			//System.out.println("CR: "+cR);
+	    			Color cL = new Color (map.getRGB(tempLx,tempLy));
+	    			//System.out.println("CL: "+cL);
+	    		//	System.out.println("ADD: "+add(waterHits)+" "+isSinking);
+	    			if (cR.equals(Color.GREEN)==true){
+	    				wallHitinWater[i]=true;
+	    				waterWallhitCount+=1;
+	    				canRight=false;
+	    				if (x>tempRx){
+	    					x+=2;
+	    					tooRight=true;
+	    				}
+	    				if (x<tempRx){
+	    					x-=2;
+	    					tooLeft=true;
+	    				}
+	    				if (y>tempRy){
+	    					y+=2;
+	    					tooUp=true;
+	    				}
+	    				if (y<tempRy){
+	    					y-=2;
+	    					tooDown=true;
+	    				}
+	    			}
+	    			if (cL.equals(Color.GREEN)==true){
+	    				wallHitinWater[i]=true;
+	    				waterWallhitCount+=1;
+	    				if (x>tempLx){
+	    					x+=2;
+	    					tooRight=true;
+	    				}
+	    				if (x<tempLx){
+	    					x-=2;
+	    					tooLeft=true;
+	    				}
+	    				if (y>tempLy){
+	    					y+=2;
+	    					tooUp=true;
+	    				}
+	    				if (y<tempLy){
+	    					y-=2;
+	    					tooDown=true;
+	    				}
+	    				canLeft=false;
+	    			}
+	    				
+	    			if (isSinking==true&&cS.equals(BLUE)==true&&i==0){	
+	    				System.out.println("ALLWATER");
+	    				y+=3;
+	    				yVel=0;
+	    				apex=y;
+	    				isSinking=false;
+	    				inAir=false;
+	    				doSome=false;
+	    				if (isClinging==true){
+	    					isClinging=false;
+	    					x+=direction*-1*1;	
+	    				}
+	    			}
+	    			if (cS.equals(BLUE)==false&&cS.equals(Color.GREEN)==false){
+	    				
+		    			System.out.println("GETOUT");
+		    			leavingWater=true;
+		    			propel=true;
+		    			isSwimming=false;
+		//    			jumpOut=true;
+		    			headAngle=90;
+				    	System.out.println("ADD"+add(waterHits));
+		    			jump();
+		    				
+		    		}
+				}
+			}
+				
+
     		if (isSwimming==false){
+    			//System.out.println("NOT-SWIMMING");
     			tempX=(int)(x+contactPoints[i][0]+xVel);
     		    tempY=(int)(y+contactPoints[i][1]+yVel);
-    		}
-    		else{
-    			double ang=Math.toRadians(headAngle);
-    			tempX=(int)(x+contactPoints[i][0]+3*Math.cos(ang)*swimDir);
-    			tempY=(int)(y+contactPoints[i][1]-3*Math.sin(ang)*swimDir);
-    		}
     		
-    		if (tempX>=0&&tempX<=levelSizeX&&tempY>=0&&tempY<=levelSizeY){
-    			Color c = new Color (map.getRGB(tempX,tempY));
-    			WallHits[i]=c.equals(Color.GREEN);
-    			if (i==6){
-    					if (c.equals(BLUE)==true&&isSwimming==false&&propel==false){
-    						System.out.println("HITWATER");
-    						isSwimming=true;
-    						isSinking=true;
-    					}
-    					if (c.equals(Color.GREEN)==false&&isSwimming==false&&isSinking==false){
-    						//System.out.println("XVEL: "+xVel);
-    						//System.out.println("yVEL: "+yVel);
-    						//System.out.println("INAIR: "+tempX+","+tempY);
-    						inAir=true;
-    						isSliding=false;
-    						
-    					}
-    			}
-    			if (isSinking==true&&i==0){
-    				if (c.equals(BLUE)==true){
-    					System.out.println("ALLWATER");
-    					y+=3;
-    					apex=y;
-    					isSinking=false;
-    					inAir=false;
-    					doSome=false;
-    				}
-    			}
-    			if (i==0&&isSwimming==true&&isSinking==false&&c.equals(BLUE)==false&&c.equals(Color.GREEN)==false){
-    				System.out.println("GETOUT");
-    				leavingWater=true;
-    				propel=true;
-    				isSwimming=false;
-//    				jumpOut=true;
-    				headAngle=90;
-    				jump();
-    				
-    			}
-    			if (c.equals(Color.GREEN)==true){
-    				
-    				if (i==0&&inAir==true){
-    					System.out.println("HITHEAD");
-    					hitHead=true;
-    					yVel=0;
-    					int j=0;
-    					while (true){
-    						Color c1= new Color (map.getRGB(tempX,y-j));
-    						if (c1.equals(Color.GREEN)==true){
-    							y=y-j+26;
-    							break;
-    						}
-    						j+=1;
-    					}
-    				}
-    				if (i==6&&inAir==true){
-    					System.out.println("HITGROUND");
-    					inAir=false;
-    					doSome=false;
-    					yVel=0;
-    					hitGround=true;
-    					airCount=0;
-    					apex=y;
-    					int j=0;
-    					while (true){
-    						Color c2= new Color (map.getRGB(tempX,y+j));
-    						if (c2.equals(Color.GREEN)==true){
-    							y=y-22+j;
-    							break;
-    						}
-    						j+=1;
-    					}
-    				}
-					if (xVel<0){
-						if (i==1||i==3||i==7){
-							System.out.println("HIT-LEFT");
-							int j=0;
-    						while (true){
-    							int temp=x-j;
-    							Color c3= new Color (map.getRGB(x-j,tempY));
-    							if (c3.equals(Color.GREEN)==true){
-    								x=x-j+14;
-       								break;
-    							}
-    							j+=1;
-    						}
-							runIntoWall=true;
-
-						}
-					}
-					if (xVel>0){
-						if (i==2||i==5||i==8){
-							System.out.println("HIT-RIGHT");
-							int j=0;
-    						while (true){
-    							Color c4= new Color (map.getRGB(x+j,tempY));
-    							if (c4.equals(Color.GREEN)==true){
-    								x=x-14+j;
-    								break;
-    							}
-    							j+=1;
-    						}
-							runIntoWall=true;
-						}	
-    				}
-    			}
-    			
+	    		if (tempX>=0&&tempX<=levelSizeX&&tempY>=0&&tempY<=levelSizeY){
+	    			Color c = new Color (map.getRGB(tempX,tempY));
+	    			if (c.equals(Color.RED)==true){
+	    				System.out.println("DEATH");
+	    			}
+	    			else{
+		    			
+		    			WallHits[i]=c.equals(Color.GREEN);
+		    			if (i==6){
+		    					footColor=c;
+		    					if (c.equals(BLUE)==true&&isSwimming==false&&propel==false){
+		    						System.out.println("HITWATER");
+		    						isSwimming=true;
+		    						isSinking=true;
+		    					}
+		    					if (c.equals(Color.GREEN)==false&&isSwimming==false&&isSinking==false){
+		    						//System.out.println("XVEL: "+xVel);
+		    					//	System.out.println("yVELGGG: "+yVel);
+		    						//System.out.println("INAIR: "+tempX+","+tempY);
+		    						inAir=true;
+		    						isSliding=false;
+		    						
+		    					}
+		    					
+		    			}
+		    			
+		    			
+		    			if (c.equals(Color.GREEN)==true){
+		    				
+		    				if (i==0&&inAir==true){
+		    					System.out.println("HITHEAD");
+		    					hitHead=true;
+		    					yVel=0;
+		    					int j=0;
+		    					while (true){
+		    						Color c1= new Color (map.getRGB(tempX,y-j));
+		    						if (c1.equals(Color.GREEN)==true){
+		    							y=y-j+26;
+		    							break;
+		    						}
+		    						j+=1;
+		    					}
+		    				}
+		    				if (i==6&&inAir==true){
+		    					System.out.println("HITGROUND");
+		    					inAir=false;
+		    					doSome=false;
+		    					yVel=0;
+		    					hitGround=true;
+		    					airCount=0;
+		    					apex=y;
+		    					int j=0;
+		    					while (true){
+		    						Color c2= new Color (map.getRGB(tempX,y+j));
+		    						if (c2.equals(Color.GREEN)==true){
+		    							y=y-22+j;
+		    							break;
+		    						}
+		    						j+=1;
+		    					}
+		    				}
+							if (xVel<0&&isSwimming==false){
+								if (i==1||i==3||i==7){
+									//System.out.println("HIT-LEFT");
+									int j=0;
+		    						while (true){
+		    							int temp=x-j;
+		    							Color c3= new Color (map.getRGB(x-j,tempY));
+		    							if (c3.equals(Color.GREEN)==true){
+		    								x=x-j+14;
+		       								break;
+		    							}
+		    							j+=1;
+		    						}
+									runIntoWall=true;
+		
+								}
+							}
+							if (xVel>0&&isSwimming==false){
+								if (i==2||i==5||i==8){
+									//System.out.println("HIT-RIGHT");
+									int j=0;
+		    						while (true){
+		    							Color c4= new Color (map.getRGB(x+j,tempY));
+		    							if (c4.equals(Color.GREEN)==true){
+		    								x=x-14+j;
+		    								break;
+		    							}
+		    							j+=1;
+		    						}
+									runIntoWall=true;
+								}	
+		    				}
+		    				
+		    			}
+	    			}
+	    			
+	    		}
     		}
     			
     		
     	}
+    	
     	if (WallHits[1]==false&&WallHits[2]==false&&WallHits[3]==false&&WallHits[5]==false&&WallHits[7]==false&&WallHits[8]==false){
     		//System.out.println("NOT-CLINGG");
     		isClinging=false;
     	}
     	else{
-    		if (inAir==true&&isSwimming==false){
-    		//	System.out.println("CLINGG");
+    		if (inAir==true&&isSwimming==false&&footColor.equals(BLUE)==false){
+    			//System.out.println("CLINGG");
 				cling();
 				}
+    	}
+    	if (waterWallhitCount>=2){
+    		System.out.println("2");
+    		for (boolean tmp:wallHitinWater){
+    			System.out.println(tmp);
+    		}
+    		if ((wallHitinWater[2]==true||wallHitinWater[5]==true||wallHitinWater[8]==true)&&(wallHitinWater[6]==true||wallHitinWater[7]==true)){
+    			System.out.println("2 CORNER");
+    			x+=-3*direction;
+    			if (y+rotatedPoints[8][1]<=y){
+    				y-=3;
+    			}
+    		}
     	}
     	//System.out.println(x);
     	//System.out.println(runIntoWall);
