@@ -69,8 +69,6 @@ public class Person {
 	private Color ORANGE = new Color (255,156,0);
 	private Color footColor;
     public Person(){
-     	x=200;
-     	y=490;
     	xVel=0;
     	yVel=0;
     	jumpVel=11;
@@ -84,6 +82,12 @@ public class Person {
     	slideCoefficient=0.5;
     	clingCoefficient=0.05;
     		
+    }
+    public void setX(int dropx){
+    	x = dropx;
+    }
+    public void setY(int dropy){
+    	y = dropy;
     }
     public void makePics(){
     	for (int j=0; j<5; j++){

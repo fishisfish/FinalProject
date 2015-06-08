@@ -12,7 +12,7 @@ public class Interactives {
 	public static final int POLE = 0;
 	public static final int LAUNDRY_LINE = 1;
 	public static final int CHECK_POINT = 2;	
-	public static final int PORTAL = 3;	
+	public static final int PORTAL = 3;
 	private boolean reached = false; //for use of check points and portal only
 	private int x,y;
     public Interactives() {
