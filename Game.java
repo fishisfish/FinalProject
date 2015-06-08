@@ -71,6 +71,8 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 		chara=new Person();
 		int lev = 1; //chooseLevel();
 		level = new Level(lev);
+		chara.setX(level.getDropx());
+		chara.setY(level.getDropy());
 		camX=400;
 		camY=300;
 		white = new ImageIcon("white.png").getImage();
@@ -84,6 +86,7 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 	public void move(){
 		chara.checkHit(level.getMap());
 		moveChara();
+		movePlats();
 	}
 	public void moveChara(){
 		if (chara.getleavingWater()==true){
@@ -228,6 +231,9 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 	
 			
 	}
+	public void movePlats(){
+		level.movePlatforms();
+	}
 	public int camAdjust(String temp,int ori){
 		if (temp=="X"){
 			//System.out.println(temp+"CAM"+camX);
@@ -251,8 +257,8 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
     	ArrayList<Platform> tmpP = level.getPlats();
     	for(int i =0;i< tmpP.size();i++){
     		System.out.println("platformssssss");
-    		g.setColor(Color.red);
-    		g.drawRect(tmpP.get(i).getX(),tmpP.get(i).getY(),tmpP.get(i).getWidth(),tmpP.get(i).getHeight());
+    		g.setColor(new Color(255,165,0));
+    		g.fillRect(camAdjust("X",tmpP.get(i).getX()),camAdjust("Y",tmpP.get(i).getY()),tmpP.get(i).getWidth(),tmpP.get(i).getHeight());
     	}
     	Image pic=chara.getPic();
     	if (chara.getSwim()==false){

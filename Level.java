@@ -26,13 +26,12 @@ public class Level {
 		}
     	Scanner infile = null;
     	//loading map info text file
-    	System.out.println("Maps/"+levelNum+".txt");
     	try{
     		infile=new Scanner(new File("Maps/"+levelNum+".txt"));
     			
     	}
     	catch(IOException ex){
-    		System.out.println("textfile problem");
+    		System.out.println("level textfile problem");
     	}
     	width = Integer.parseInt(infile.nextLine());
     	System.out.println(width);
@@ -45,7 +44,7 @@ public class Level {
     		Platform tmp = new Platform(line);
     		movingPlats.add(tmp);
     	}
-    	//load traps
+    	//load traps								<=============to be completed
     }
     public BufferedImage getMap(){
     	return map;
@@ -57,4 +56,9 @@ public class Level {
     public int getHeight(){return height;}
     public int getDropx(){return dropx;}
     public int getDropy(){return dropy;}
+    public void movePlatforms(){
+    	for (int i=0;i<movingPlats.size();i++){
+    		movingPlats.get(i).move();
+    	}
+    }
 }

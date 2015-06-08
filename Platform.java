@@ -15,11 +15,13 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class Platform{
-	private int x,y,dx,dy,width,height,dir,vel;
+	private int x,y,ox,oy,dx,dy,width,height,dir,vel;
 	public Platform(String line){
 		String [] data = line.split(",");
 		x = Integer.parseInt(data[0]);
 		y = Integer.parseInt(data[1]);
+		ox = x;
+		oy = y;
 		width = Integer.parseInt(data[2]);
 		height = Integer.parseInt(data[3]);
 		dx = Integer.parseInt(data[4]);
@@ -32,12 +34,30 @@ public class Platform{
 	public int getWidth(){return width;}
 	public int getHeight(){return height;}
 	
-	/*public boolean onTop(){
-		//tells whether person is on top of the special block, which is a necessary condition for type 0, 1 to be effective
-	}*/
-	
 	public void move(){
-		
+		if (dx!=0){
+			if ((x-ox)*dir<dx){
+				x += vel*dir;
+				String velo = vel+"";
+				//System.out.println("VELOCITY: " + velo + "\nDIRECTION")
+			}
+			else{
+				dir*=-1;
+				x += vel*dir;
+			}
+		}
+		else{
+			if ((y-oy)*dir<dy){
+				y += vel*dir;
+				String velo = vel+"";
+				//System.out.println("VELOCITY: " + velo + "\nDIRECTION")
+			}
+			else{
+				dir*=-1;
+				y += vel*dir;
+			}
+		}
+			
 	}
 	
 	
