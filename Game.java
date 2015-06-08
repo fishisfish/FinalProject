@@ -69,7 +69,7 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 		mosX=0;
 		mosY=0;
 		chara=new Person();
-		int lev = 1; //chooseLevel();
+		int lev = chooseLevel(); //chooseLevel();
 		level = new Level(lev);
 		chara.setX(level.getDropx());
 		chara.setY(level.getDropy());
@@ -82,6 +82,12 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 		addMouseMotionListener(this);
 		addKeyListener(this);
 		
+	}
+	public static int chooseLevel(){
+		Scanner kb = new Scanner(System.in);
+		System.out.println("Choose a level:");
+		int lev = kb.nextInt();
+		return lev;
 	}
 	public void move(){
 		chara.checkHit(level.getMap());
