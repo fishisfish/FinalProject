@@ -17,7 +17,6 @@ import javax.swing.JPanel.*;
 import java.util.ArrayList;
 import java.io.*;
 import java.util.Scanner;
-import java.util.ArrayList;
 import java.util.LinkedList;
 public class Game extends JFrame implements ActionListener {
 	Timer myTimer;
@@ -74,7 +73,7 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 		camY=300;
 		white = new ImageIcon("white.png").getImage();
 		try{
-			background= ImageIO.read(new File("Maps/Act 1-1.png"));
+			background= ImageIO.read(new File("Maps/Act 1.png"));
 		}
 		catch(IOException e){
 			System.out.println("loading problem");
@@ -143,19 +142,19 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 			chara.swimSlow();
 			chara.sink();
 			if (keys[KeyEvent.VK_LEFT]){
-				chara.swim("LEFT");
+				chara.swim("LEFT", background);
 			}
 			if (keys[KeyEvent.VK_RIGHT]){
-				chara.swim("RIGHT");
+				chara.swim("RIGHT", background);
 			}
 			if (keys[KeyEvent.VK_UP]){
-				chara.swim("UP");
+				chara.swim("UP", background);
 				//System.out.println("UPPP");
 				//System.out.println("PROPEL: "+chara.getleavingWater());
 				
 			}
 			if (keys[KeyEvent.VK_DOWN]){
-				chara.swim("DOWN");
+				chara.swim("DOWN", background);
 			}
 			chara.rotate();	
 		}
@@ -268,13 +267,14 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 			g2D.drawImage(pic,camAdjust("X",chara.getX()-(int)(pic.getWidth(null)/2)),camAdjust("Y",chara.getY()-(int)(pic.getHeight(null)/2)),this);
 	
 			g2D.setTransform(saveXform);
+			//g.drawRect(camAdjust("X",chara.getX()-15),camAdjust("Y",chara.getY())-25,30,45);
+	    	
 			int [][]tmp=chara.getPoints();
-			for (int i=0;i<1;i++){
+			for (int i=0;i<9;i++){
 				int [] point=tmp[i];
-				//g.drawOval(camAdjust("X",chara.getX()+point[0]-(int)(pic.getWidth(null)/2)),camAdjust("Y",chara.getY()+point[1]-(int)(pic.getHeight(null)/2)),2,2);
-				g.drawRect(camAdjust("X",chara.getX()),camAdjust("Y",chara.getY()),5,5);
-				System.out.println(chara.getX()+point[0]);
-				System.out.println(chara.getY()+point[1]);
+				g.drawOval(camAdjust("X",chara.getX()+point[0]),camAdjust("Y",chara.getY()+point[1]),2,2);
+			//	System.out.println(point[0]);
+			//	System.out.println(point[1]);
 			}
     	}
     }
