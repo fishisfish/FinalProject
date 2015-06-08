@@ -68,13 +68,14 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 		mainFrame=m;
 		mosX=0;
 		mosY=0;
-		chara=new Person();
+		
 		int lev = 1; //chooseLevel();
 		level = new Level(lev);
+		chara=new Person(lev);
 		chara.setX(level.getDropx());
 		chara.setY(level.getDropy());
-		camX=400;
-		camY=300;
+		camX=level.getDropx();
+		camY=level.getDropy()-300;
 		white = new ImageIcon("white.png").getImage();
 		System.out.println("dd");
 		keys = new boolean[65535];
@@ -189,7 +190,7 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 			}
 		
 		camX=Math.max(400,camX);
-		camX=Math.min(1400,camX);
+		camX=Math.min(level.getWidth(),camX);
 		if (chara.getinAir()==false){
 			System.out.println(camY-chara.getY());
 			if (Math.abs(camY-chara.getY())>3){
@@ -198,7 +199,7 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 				}
 			
 				else{
-					if(camY<chara.getY()&&camY+2<=1000){
+					if(camY<chara.getY()&&camY+2<=level.getHeight()){
 					System.out.println("MOVEDOWNSLOWLY");
 					camY+=2;
 					}
@@ -235,7 +236,7 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 			} 
 		}
 		camY=Math.max(300,camY);
-		camY=Math.min(2000,camY);
+		camY=Math.min(level.getHeight(),camY);
 	
 			
 	}
@@ -264,7 +265,7 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
     	g.drawImage(level.getMap(),camAdjust("X",0),camAdjust("Y",0),this);
     	ArrayList<Platform> tmpP = level.getPlats();
     	for(int i =0;i< tmpP.size();i++){
-    		g.setColor(new Color(255,165,0));
+    		g.setColor(ORANGE);
     		g.fillRect(camAdjust("X",tmpP.get(i).getX()),camAdjust("Y",tmpP.get(i).getY()),tmpP.get(i).getWidth(),tmpP.get(i).getHeight());
     	}
     	Image pic=chara.getPic();

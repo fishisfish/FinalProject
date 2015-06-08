@@ -14,7 +14,7 @@ import java.util.Scanner;
 public class Level {
 	private BufferedImage map;
 	private ArrayList<Platform> movingPlats = new ArrayList<Platform>();
-	private int width,height,dropx,dropy;
+	private int width,height,dropx,dropy,direction;
     public Level(int lev) {
     	String levelNum = lev + "";
     	//import map as BufferedImage
@@ -33,8 +33,8 @@ public class Level {
     	catch(IOException ex){
     		System.out.println("level textfile problem");
     	}
+    	direction = Integer.parseInt(infile.nextLine());
     	width = Integer.parseInt(infile.nextLine());
-    	System.out.println(width);
     	height = Integer.parseInt(infile.nextLine());
     	dropx = Integer.parseInt(infile.nextLine());
     	dropy = Integer.parseInt(infile.nextLine());
@@ -56,6 +56,7 @@ public class Level {
     public int getHeight(){return height;}
     public int getDropx(){return dropx;}
     public int getDropy(){return dropy;}
+    public int getDir(){return direction;}
     public void movePlatforms(){
     	for (int i=0;i<movingPlats.size();i++){
     		movingPlats.get(i).move();
