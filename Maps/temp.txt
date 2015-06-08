@@ -3,7 +3,7 @@ dimension y
 drop site x
 drop site y
 # of moving platforms
-x,y,h,w,dx,dy,direction,velocity
+x,y,w,h,dx,dy,direction,velocity
 
 directions:
 

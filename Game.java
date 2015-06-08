@@ -17,7 +17,6 @@ import javax.swing.JPanel.*;
 import java.util.ArrayList;
 import java.io.*;
 import java.util.Scanner;
-import java.util.ArrayList;
 import java.util.LinkedList;
 public class Game extends JFrame implements ActionListener {
 	Timer myTimer;
@@ -51,8 +50,7 @@ public class Game extends JFrame implements ActionListener {
 
 }
  
-class GamePanel extends JPanel implements MouseListener, MouseMotionListener, KeyListener{
-	private BufferedImage background;//=new ImageIcon("Castiel.png").getImage();; 
+class GamePanel extends JPanel implements MouseListener, MouseMotionListener, KeyListener{ 
 	private Image white;
 	private Game mainFrame;
 	private int mosX,mosY,ncamX,ncamY,camX,camY;
@@ -63,6 +61,7 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 	private boolean canSome=false;
 	boolean jumpOff;
 	private Person chara;
+	private Level level;
 	private static final int RIGHT=1;
 	private static final int LEFT=-1;
 	public GamePanel(Game m){
@@ -70,15 +69,13 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 		mosX=0;
 		mosY=0;
 		chara=new Person();
+		int lev = 1; //chooseLevel();
+		level = new Level(lev);
+		chara.setX(level.getDropx());
+		chara.setY(level.getDropy());
 		camX=400;
 		camY=300;
 		white = new ImageIcon("white.png").getImage();
-		try{
-			background= ImageIO.read(new File("Maps/Act 1-1.png"));
-		}
-		catch(IOException e){
-			System.out.println("loading problem");
-		}
 		System.out.println("dd");
 		keys = new boolean[65535];
 		addMouseListener(this);
@@ -87,8 +84,9 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 		
 	}
 	public void move(){
-		chara.checkHit(background);
+		chara.checkHit(level.getMap());
 		moveChara();
+		movePlats();
 	}
 	public void moveChara(){
 		if (chara.getleavingWater()==true){
@@ -233,6 +231,9 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 	
 			
 	}
+	public void movePlats(){
+		level.movePlatforms();
+	}
 	public int camAdjust(String temp,int ori){
 		if (temp=="X"){
 			//System.out.println(temp+"CAM"+camX);
@@ -252,8 +253,12 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
     @Override
     public void paintComponent(Graphics g){
     	g.drawImage(white,0,0,this);
-    	g.drawImage(background,camAdjust("X",0),camAdjust("Y",0),this);
-    	
+    	g.drawImage(level.getMap(),camAdjust("X",0),camAdjust("Y",0),this);
+    	ArrayList<Platform> tmpP = level.getPlats();
+    	for(int i =0;i< tmpP.size();i++){
+    		g.setColor(new Color(255,165,0));
+    		g.fillRect(camAdjust("X",tmpP.get(i).getX()),camAdjust("Y",tmpP.get(i).getY()),tmpP.get(i).getWidth(),tmpP.get(i).getHeight());
+    	}
     	Image pic=chara.getPic();
     	if (chara.getSwim()==false){
     		g.drawRect(camAdjust("X",chara.getX()-15),camAdjust("Y",chara.getY())-25,30,45);
