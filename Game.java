@@ -186,15 +186,15 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 		camX=Math.max(400,camX);
 		camX=Math.min(1400,camX);
 		if (chara.getinAir()==false){
-		//	System.out.println(camY-chara.getY());
+			System.out.println(camY-chara.getY());
 			if (Math.abs(camY-chara.getY())>3){
 				if (camY>chara.getY()&&camY-2>=300){
 					camY-=2;
 				}
 			
 				else{
-					if(camY+2<=1000){
-					//System.out.println("MOVEDOWNSLOWLY");
+					if(camY<chara.getY()&&camY+2<=1000){
+					System.out.println("MOVEDOWNSLOWLY");
 					camY+=2;
 					}
 				}
@@ -223,12 +223,14 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 				}
 					
 				else{
-					//System.out.println("OTHER");
+					System.out.println("OTHER");
 					camY+=-1*chara.getyMoved();
 				}
 				
 			} 
 		}
+		camY=Math.max(300,camY);
+		camY=Math.min(2000,camY);
 	
 			
 	}
@@ -269,13 +271,13 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 			g2D.setTransform(saveXform);
 			//g.drawRect(camAdjust("X",chara.getX()-15),camAdjust("Y",chara.getY())-25,30,45);
 	    	
-			int [][]tmp=chara.getPoints();
-			for (int i=0;i<9;i++){
-				int [] point=tmp[i];
-				g.drawOval(camAdjust("X",chara.getX()+point[0]),camAdjust("Y",chara.getY()+point[1]),2,2);
+			//int [][]tmp=chara.getPoints();
+			//for (int i=0;i<9;i++){
+				//int [] point=tmp[i];
+				//g.drawOval(camAdjust("X",chara.getX()+point[0]),camAdjust("Y",chara.getY()+point[1]),2,2);
 			//	System.out.println(point[0]);
 			//	System.out.println(point[1]);
-			}
+			//}
     	}
     }
     public void mouseReleased(MouseEvent e){
