@@ -29,8 +29,25 @@ public class Platform{
 		dir = Integer.parseInt(data[6]);
 		vel = Integer.parseInt(data[7]);
 	}
-	public int getX(){return x;}
+	public int getX(){;return x;}
 	public int getY(){return y;}
+	public int getxVel(){
+		if (dx!=0){
+			return vel*dir;
+		}
+		else{
+			return 0;
+		}
+	}
+	public int getyVel(){
+		if (dy!=0){
+			return vel*dir;
+		}
+		else{
+			return 0;
+		}
+		}
+	
 	public int getWidth(){return width;}
 	public int getHeight(){return height;}
 	

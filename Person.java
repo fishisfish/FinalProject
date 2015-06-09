@@ -17,6 +17,7 @@ import java.io.*;
 import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import javax.imageio.ImageIO;
 public class Person {
 	private int x,y,walkCount,airCount,swimCount,breathCount,picStall,stopSwim, jumpVel, propelVel,levelSizeX,levelSizeY;
 	private ArrayList<ArrayList<ArrayList<Image>>> allPics = new ArrayList<ArrayList<ArrayList<Image>>>();
@@ -33,6 +34,8 @@ public class Person {
 	private int contactRecty = 42;
 	private int apex;
 	private int lastWallx;
+	private int xplatVel=0;
+    private int	yplatVel=0;
 	private static final int RIGHT=1;
 	private static final int LEFT=-1;
 	private boolean inAir=false;
@@ -57,8 +60,11 @@ public class Person {
     private boolean tooLeft=false;
     private boolean tooUp=false;
     private boolean tooDown=false;
+    private boolean onPlat=false;
     private boolean[] WallHits = new boolean[9];
+    private boolean[] MovingStuffHits = new boolean[9];
     private boolean [] wallHitinWater = new boolean [9];
+    
     private int [] waterHits = new int [9];
  	private int[][] contactPoints = {{0,-25},{-15,-24},{15,-24},{-15,0},{0,0},{15,0},{0,22},{-15,21},{15,21}};
  	private int[][] rotatedPoints = {{0,-23},{-13,-22},{10,-22},{-13,0},{0,0},{10,0},{0,22},{-13,21},{10,21}};
@@ -66,9 +72,16 @@ public class Person {
  	private double [] cptStartAngles={Math.toRadians(90),Math.toRadians(90)+Math.atan(13.0/22.0),Math.atan(22.0/10.0),Math.toRadians(180),-10000,0,Math.toRadians(270),Math.toRadians(180)+Math.atan(21.0/13.0),Math.toRadians(270)+Math.atan(10.0/21.0)};	
  	private Color BLUE = new Color (0,165,255);
 	private Color PURPLE = new Color (200,0,200);
-	private Color ORANGE = new Color (255,156,0);
+	private Color ORANGE = new Color (255,153,0);
 	private Color footColor;
-    public Person(){
+	private Level level;
+	private BufferedImage movingStuff;
+	private Graphics2D g2;
+    public Person(Level lev){
+    	level= lev;
+    	movingStuff = new BufferedImage(level.getWidth(), level.getHeight(),  BufferedImage.TYPE_BYTE_INDEXED);
+    	g2 = movingStuff.createGraphics();
+    	//System.out.println(level.getWidth());
     	xVel=0;
     	yVel=0;
     	jumpVel=11;
@@ -304,8 +317,8 @@ public class Person {
     		x+=(int)(4*direction);
     	}
     	if (inAir==true){
-    			System.out.println("DIR: "+direction);
-    			System.out.println("XmVEL: "+xVel);
+    			//System.out.println("DIR: "+direction);
+    		//	System.out.println("XmVEL: "+xVel);
     			if (direction*xVel<0){
     				System.out.println("ORI: "+xVel);
     				xVel*=-1;
@@ -534,16 +547,16 @@ public class Person {
     	return sum;
     }
     public boolean canSwim(double An, int dir, BufferedImage map){
-    	System.out.println("TEST");
+    	//System.out.println("TEST");
     	int tempX=x+(int)(3*Math.cos(An)*dir);
     	int tempY=y-(int)(3*Math.sin(An)*dir);
     	for (int i=0;i<9;i++){
     		int [] tmp= rotatedPoints[i];
     		Color c = new Color (map.getRGB(tempX+tmp[0],tempY+tmp[1]));
     		if (c.equals(Color.GREEN)==true){
-    			System.out.println("ISSWIMATWALL");
-    			System.out.println(y+tmp[1]);
-    			System.out.println(y);
+    			//System.out.println("ISSWIMATWALL");
+    			//System.out.println(y+tmp[1]);
+    			//System.out.println(y);
     		/*	if (y+tmp[1]<=y){
     				System.out.println("TURN-UP");
     				headAngle+=1;
@@ -559,7 +572,69 @@ public class Person {
     	System.out.println("CANSWIM");	
 		return true;
     }
+	public boolean checkPlatCollide(Platform plat, boolean temp){
+    	for (int i=0;i<9;i++){
+    		if (i>=7){
+    			int [] tmp=contactPoints[i];
+	    		if (y+tmp[1]>=plat.getY()&&y+tmp[1]+yVel<=plat.getY()+plat.getHeight()){
+	
+	    		
+	    			//System.out.println("TMP: "+tmp[0]);
+	    			int tmemp=x+tmp[0];
+	
+	    			
+	    			if (x+tmp[0]>=plat.getX()&&x+tmp[0]<=plat.getX()+plat.getWidth()){
+	    				onPlat=true;
+	    				inAir=false;
+	    			//	System.out.println("YYYBEFORE:      "+y);
+	    				y=(int)(plat.getY()-21+yVel);
+	    			//	System.out.println("YYY:      "+y);
+	    			//	System.out.println("XVEL:      "+plat.getxVel());
+	    				xplatVel=plat.getxVel();
+	    				yplatVel=plat.getyVel();
+	    			}
+	    		}
+    		}
+    	}
+    	return onPlat;
+    	//System.out.println(onPlat);
+    }
     public void checkHit(BufferedImage map){
+    	//System.out.println(level.getWidth());
+    	//System.out.println(level);
+    	//System.out.println(level.getHeight());
+		g2 = movingStuff.createGraphics();
+    	g2.setColor(Color.WHITE);
+    	g2.fillRect(0,0,level.getWidth(),level.getHeight());
+    	
+    	ArrayList<Platform> tmpP = level.getPlats();
+    	onPlat=false;
+    	xplatVel=0;
+    	yplatVel=0;
+    	for(int i =0;i< tmpP.size();i++){
+    		g2.setColor(ORANGE);
+    		g2.fillRect(tmpP.get(i).getX(), tmpP.get(i).getY(),tmpP.get(i).getWidth(),tmpP.get(i).getHeight());
+    		if (i==1){
+    		//	System.out.println(tmpP.get(i).getY());
+    		}
+    		onPlat=checkPlatCollide(tmpP.get(i),onPlat);
+    	}
+    	if (onPlat==true){
+    	//	System.out.println("BEFORE: "+x);
+    		x+=xplatVel;
+    	//	System.out.println("AFTER: "+x);
+    		y+=yplatVel;
+    		
+    	}
+
+    	//g2.setColor(Color.WHITE);
+    	//g2.fillRect(0,0,level.getWidth(),level.getHeight());
+    	//try{
+    		//File outputfile = new File("1.png");
+    		//ImageIO.write(movingStuff, "png", outputfile);
+    //	}
+    //	catch (IOException e) {
+    	//} 
     	//System.out.println(y);
     	//starting in top left corner and going horizontally to right, start on left again in next row (9 points total)
     	
@@ -584,9 +659,13 @@ public class Person {
 	//	System.out.println("INAIR: "+inAir);
     	for (int i=0;i<9;i++){
     		int tempX,tempY,tempRx,tempRy,tempLx,tempLy;
-    		Color cS = new Color (map.getRGB(x+rotatedPoints[i][0],y+rotatedPoints[i][1]));
+    	//	System.out.println(x+rotatedPoints[i][0]);
+    	//	System.out.println(y+rotatedPoints[i][1]);
+    		
 			if (isSwimming==true){
-				if (cS.equals(Color.RED)==true){
+				Color cS = new Color (map.getRGB(x+rotatedPoints[i][0],y+rotatedPoints[i][1]));
+    			Color csM = new Color (movingStuff.getRGB(x+rotatedPoints[i][0],y+rotatedPoints[i][1]));
+				if (cS.equals(Color.RED)==true||csM.equals(ORANGE)==true){
 					System.out.println("DEATH");
 				}
 				else{
@@ -687,12 +766,19 @@ public class Person {
     		
 	    		if (tempX>=0&&tempX<=levelSizeX&&tempY>=0&&tempY<=levelSizeY){
 	    			Color c = new Color (map.getRGB(tempX,tempY));
-	    			if (c.equals(Color.RED)==true){
+	    			Color cM = new Color (movingStuff.getRGB(tempX,tempY));
+	    		//	System.out.println(cM2);
+	    	//		if (cM.equals(ORANGE)==true){
+	    	//			System.out.println("ORANG");
+	    				
+	    			//}
+	    			if (c.equals(Color.RED)==true||cM.equals(Color.RED)==true){
 	    				System.out.println("DEATH");
 	    			}
 	    			else{
 		    			
 		    			WallHits[i]=c.equals(Color.GREEN);
+		    			MovingStuffHits[i]=cM.equals(ORANGE);
 		    			if (i==6){
 		    					footColor=c;
 		    					if (c.equals(BLUE)==true&&isSwimming==false&&propel==false){
@@ -700,10 +786,10 @@ public class Person {
 		    						isSwimming=true;
 		    						isSinking=true;
 		    					}
-		    					if (c.equals(Color.GREEN)==false&&isSwimming==false&&isSinking==false){
-		    						//System.out.println("XVEL: "+xVel);
+		    					if (onPlat==false&&c.equals(Color.GREEN)==false&&cM.equals(ORANGE)==false&&isSwimming==false&&isSinking==false){
+		    					//	System.out.println("XVEL: "+xVel);
 		    					//	System.out.println("yVELGGG: "+yVel);
-		    						//System.out.println("INAIR: "+tempX+","+tempY);
+		    					//	System.out.println("INAIR: "+tempX+","+tempY);
 		    						inAir=true;
 		    						isSliding=false;
 		    						
@@ -712,19 +798,32 @@ public class Person {
 		    			}
 		    			
 		    			
-		    			if (c.equals(Color.GREEN)==true){
+		    			if (c.equals(Color.GREEN)==true||cM.equals(ORANGE)==true){
 		    				
 		    				if (i==0&&inAir==true){
 		    					System.out.println("HITHEAD");
 		    					hitHead=true;
 		    					yVel=0;
 		    					int j=0;
+		    					Color c1;
 		    					while (true){
-		    						Color c1= new Color (map.getRGB(tempX,y-j));
-		    						if (c1.equals(Color.GREEN)==true){
-		    							y=y-j+26;
-		    							break;
+		    						if (WallHits[i]==true){
+		    							c1= new Color (map.getRGB(tempX,y-j));
+			    						if (c1.equals(Color.GREEN)==true){
+			    							y=y-j+26;
+			    							break;
+			    						}
 		    						}
+		    						else if (MovingStuffHits[i]==true){
+		    							c1= new Color (movingStuff.getRGB(tempX,y-j));
+		    							System.out.println(c1);
+		    							if (c1.equals(ORANGE)==true){
+		    								y=y-j+26;
+		    								break;
+		    							}
+		    						}
+		    						
+		    						
 		    						j+=1;
 		    					}
 		    				}
@@ -737,9 +836,11 @@ public class Person {
 		    					airCount=0;
 		    					apex=y;
 		    					int j=0;
+		    					Color c2;
 		    					while (true){
-		    						Color c2= new Color (map.getRGB(tempX,y+j));
-		    						if (c2.equals(Color.GREEN)==true){
+		    						c2= new Color (map.getRGB(tempX,y+j));
+
+		    						if (c2.equals(Color.GREEN)==true){//||cM2.equals(ORANGE)==true){
 		    							y=y-22+j;
 		    							break;
 		    						}
@@ -753,7 +854,7 @@ public class Person {
 		    						while (true){
 		    							int temp=x-j;
 		    							Color c3= new Color (map.getRGB(x-j,tempY));
-		    							if (c3.equals(Color.GREEN)==true){
+		    							if (c3.equals(Color.GREEN)==true){//||cM2.equals(ORANGE)==true){
 		    								x=x-j+14;
 		       								break;
 		    							}
@@ -769,7 +870,7 @@ public class Person {
 									int j=0;
 		    						while (true){
 		    							Color c4= new Color (map.getRGB(x+j,tempY));
-		    							if (c4.equals(Color.GREEN)==true){
+		    							if (c4.equals(Color.GREEN)==true){//||cM2.equals(ORANGE)==true){
 		    								x=x-14+j;
 		    								break;
 		    							}
@@ -787,7 +888,7 @@ public class Person {
     			
     		
     	}
-    	
+    	g2.dispose();
     	if (WallHits[1]==false&&WallHits[2]==false&&WallHits[3]==false&&WallHits[5]==false&&WallHits[7]==false&&WallHits[8]==false){
     		//System.out.println("NOT-CLINGG");
     		isClinging=false;
@@ -799,12 +900,12 @@ public class Person {
 				}
     	}
     	if (waterWallhitCount>=2){
-    		System.out.println("2");
+    		//System.out.println("2");
     		for (boolean tmp:wallHitinWater){
-    			System.out.println(tmp);
+    			//System.out.println(tmp);
     		}
     		if ((wallHitinWater[2]==true||wallHitinWater[5]==true||wallHitinWater[8]==true)&&(wallHitinWater[6]==true||wallHitinWater[7]==true)){
-    			System.out.println("2 CORNER");
+    		//	System.out.println("2 CORNER");
     			x+=-3*direction;
     			if (y+rotatedPoints[8][1]<=y){
     				y-=3;
