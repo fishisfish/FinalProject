@@ -267,7 +267,12 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
     	Image pic=chara.getPic();
     	if (chara.getSwim()==false){
     		g.drawRect(camAdjust("X",chara.getX()-15),camAdjust("Y",chara.getY())-25,30,45);
-	    	g.drawImage(pic,camAdjust("X",chara.getX()-(int)(pic.getWidth(null)/2)),camAdjust("Y",chara.getY()-(int)(pic.getHeight(null)/2)),this);
+    		if (chara.getCling()==false){
+	    		g.drawImage(pic,camAdjust("X",chara.getX()-(int)(pic.getWidth(null)/2)),camAdjust("Y",chara.getY()-(int)(pic.getHeight(null)/2)),this);
+    		}
+    		else{
+    			g.drawImage(pic,camAdjust("X",chara.getX()-(int)(pic.getWidth(null)/2)+chara.getDir()*5),camAdjust("Y",chara.getY()-(int)(pic.getHeight(null)/2)),this);
+    		}
     	}
     	else{
     		Graphics2D g2D = (Graphics2D)g;

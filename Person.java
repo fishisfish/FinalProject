@@ -237,6 +237,9 @@ public class Person {
     		return allPics.get(direction+1).get(3).get(5);
     		
     	}
+    	if (inAir==true&&isClinging==true){
+    		return allPics.get(direction+1).get(1).get(4);
+    	}
     	if (inAir==false&&Math.abs(xVel)>0&&isWalking==true){
    	    	picStall+=1;
 	    	if (picStall==10){
@@ -273,7 +276,7 @@ public class Person {
 	    	else{
 	    	
 		    	if (yVel<=10&&yVel>=6){
-		    		allPics.get(direction+1).get(1).get(0);
+		    		return allPics.get(direction+1).get(1).get(0);
 		    	}
 		    	else if (yVel<6&&yVel>=0){
 					return allPics.get(direction+1).get(1).get(1);
