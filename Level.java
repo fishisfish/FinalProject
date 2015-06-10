@@ -14,7 +14,6 @@ import java.util.Scanner;
 public class Level {
 	private BufferedImage map;
 	private ArrayList<Platform> movingPlats = new ArrayList<Platform>();
-	private ArrayList<>
 	private int width,height,dropx,dropy,direction;
     public Level(int lev) {
     	String levelNum = lev + "";
