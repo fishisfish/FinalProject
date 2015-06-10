@@ -207,7 +207,7 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 				
 			}
 			if (keys[KeyEvent.VK_DOWN]){
-				chara.swim("DOWNn", level.getMap());
+				chara.swim("DOWN", level.getMap());
 			}
 			chara.rotate();	
 		}
