@@ -137,6 +137,7 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 			 sMin="0"+sMin;
 		}
 		String tmp = sMin+":"+sSec;
+		System.out.println(tmp);
 		return tmp;
 	}
 	public void moveChara(){
@@ -278,7 +279,7 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 			}
 		}
 		else{
-			System.out.println("DER");
+		//	System.out.println("DER");
 			if (chara.getyMoved()>0){
 				chara.reachingApex(false);
 			}
@@ -286,10 +287,10 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 				chara.reachingApex(true);
 			}
 			if (Math.abs(camY-chara.getY())>20||chara.reachedApex()==false&&chara.getyMoved()<0){
-				System.out.println("HERP");
-				System.out.println(chara.reachedApex());
-				System.out.println(chara.getApex());
-				System.out.println(camY);
+				//System.out.println("HERP");
+				//System.out.println(chara.reachedApex());
+				//System.out.println(chara.getApex());
+				//System.out.println(camY);
 				if (chara.reachedApex()==false&&camY>chara.getApex()){
 					System.out.println("MERP");
 					if (Math.abs(camY-chara.getY())>15){
@@ -376,11 +377,12 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 			//	System.out.println(point[0]);
 			//	System.out.println(point[1]);
 			//}
-			g.setFont(font); 
-			g.setColor(Color.BLACK);
-        	g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON); //makes the font pretty when its drawn
-			g.drawString(getTime(timePassed),camAdjust("X",400),camAdjust("Y",300));
+			
     	}
+    	g.setFont(font); 
+		g.setColor(Color.BLACK);
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON); //makes the font pretty when its drawn
+		g.drawString(getTime(timePassed),700,40);
     }
     public void mouseReleased(MouseEvent e){
     	mousePressed=false;

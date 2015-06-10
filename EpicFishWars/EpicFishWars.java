@@ -307,7 +307,6 @@ class GamePanel extends JPanel implements KeyListener, MouseMotionListener, Mous
 		Graphics2D g2 = (Graphics2D)g;
 		g.setColor(Color.white);
         g.setFont(font); 
-        
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON); //makes the font pretty when its drawn
 		
 		if (atmenuScreen==true&&highScorepage==false){  //draws the menu screen
