@@ -64,6 +64,7 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 	private Level level;
 	private static final int RIGHT=1;
 	private static final int LEFT=-1;
+	private Color ORANGE = new Color (255,153,0);
 	public GamePanel(Game m){
 		mainFrame=m;
 		mosX=0;
@@ -74,8 +75,8 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 		chara=new Person(level);
 		chara.setX(level.getDropx());
 		chara.setY(level.getDropy());
-		camX=400;
-		camY=300;
+		camX=level.getDropx();
+		camY=level.getDropy()-300;
 		white = new ImageIcon("white.png").getImage();
 	//	System.out.println("dd");
 		keys = new boolean[65535];
@@ -84,11 +85,18 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 		addKeyListener(this);
 		
 	}
+	public static int chooseLevel(){
+		Scanner kb = new Scanner(System.in);
+		System.out.println("Choose a level:");
+		int lev = kb.nextInt();
+		return lev;
+	}
 	public void move(){
 		chara.checkHit(level.getMap());
-		moveChara();
 		movePlats();
-	}
+		moveChara();
+		
+	} 
 	public void moveChara(){
 		if (chara.getleavingWater()==true){
 				//	System.out.println("LEFTWATER");
@@ -118,8 +126,9 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 					canSome=false;
 					chara.some("");
 				}
-				if (chara.getCling()==true&&canSome==true){
+				if ((chara.getCling()==true||chara.getPCling()==true)&&canSome==true){
 					canSome=false;
+					System.out.println("OFFWALL");
 					chara.some("OFFWALL");
 				}
 			}
@@ -160,11 +169,22 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 		}
 		if (chara.getMoved()==false){
 			if (Math.abs(camX-chara.getX())>3){
-				if (camX>chara.getX()){
-					camX-=2;
+				if (Math.abs(camX-chara.getX())>50){
+					if (camX>chara.getX()){
+						camX-=5;
+					}
+					else{
+						camX+=5;
+					}
 				}
 				else{
-					camX+=2;
+				
+					if (camX>chara.getX()){
+						camX-=2;
+					}
+					else{
+						camX+=2;
+					}
 				}
 			}
 			else{
@@ -184,53 +204,75 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 			}
 		
 		camX=Math.max(400,camX);
-		camX=Math.min(1400,camX);
+		camX=Math.min(level.getWidth(),camX);
 		if (chara.getinAir()==false){
-			//System.out.println(camY-chara.getY());
+			System.out.println(camY-chara.getY());
 			if (Math.abs(camY-chara.getY())>3){
-				if (camY>chara.getY()&&camY-2>=300){
-					camY-=2;
+				if (Math.abs(camY-chara.getY())>50){
+					if (camY>chara.getY()){
+						camY-=5;
+					}
+					else{
+						if(camY<chara.getY()){
+						camY+=5;
+						}
+					}
 				}
-			
 				else{
-					if(camY<chara.getY()&&camY+2<=1000){
-					//System.out.println("MOVEDOWNSLOWLY");
-					camY+=2;
+					if (camY>chara.getY()){
+						camY-=2;
+					}
+					else{
+						if(camY<chara.getY()){
+						camY+=2;
+						}
 					}
 				}
 				
 			}
 			else{
-				//System.out.println("TELEPORT");
 				camY=chara.getY();
 			}
 		}
 		else{
-		//	System.out.println("Y: "+chara.getY());
-		//	System.out.println("CAMY: "+camY);
-		//	System.out.println("MOVED: "+chara.getyMoved());
+			System.out.println("DER");
 			if (chara.getyMoved()>0){
 				chara.reachingApex(false);
 			}
+			if (camY>=300){
+				chara.reachingApex(true);
+			}
 			if (Math.abs(camY-chara.getY())>20||chara.reachedApex()==false&&chara.getyMoved()<0){
+				System.out.println("HERP");
+				System.out.println(chara.reachedApex());
+				System.out.println(chara.getApex());
+				System.out.println(camY);
 				if (chara.reachedApex()==false&&camY>chara.getApex()){
-			//		System.out.println("GOING UP");
-					camY+=-1*Math.abs(chara.getyMoved());
+					System.out.println("MERP");
+					if (Math.abs(camY-chara.getY())>15){
+						camY+=-1*(Math.abs(chara.getyMoved())+3);
+					}
+					else{
+						camY+=-1*Math.abs(chara.getyMoved());
+					}
 					if (camY<=chara.getApex()){
-			//			System.out.println("APEX");
 						chara.reachingApex(true);
 					}
 				}
 					
 				else{
-				//	System.out.println("OTHER");
-					camY+=-1*chara.getyMoved();
+					if (Math.abs(camY-chara.getY())>50){
+						camY+=-1*(chara.getyMoved()+5);
+					}
+					else{
+						camY+=-1*chara.getyMoved();
+					}
 				}
 				
 			} 
 		}
 		camY=Math.max(300,camY);
-		camY=Math.min(2000,camY);
+		camY=Math.min(level.getHeight(),camY);
 	
 			
 	}
@@ -261,7 +303,7 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
     	g.drawImage(level.getMap(),camAdjust("X",0),camAdjust("Y",0),this);
     	ArrayList<Platform> tmpP = level.getPlats();
     	for(int i =0;i< tmpP.size();i++){
-    		g.setColor(new Color(255,165,0));
+    		g.setColor(ORANGE);
     		g.fillRect(camAdjust("X",tmpP.get(i).getX()),camAdjust("Y",tmpP.get(i).getY()),tmpP.get(i).getWidth(),tmpP.get(i).getHeight());
     	}
     	Image pic=chara.getPic();
