@@ -76,6 +76,7 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 	private static final int RIGHT=1;
 	private static final int LEFT=-1;
 	private Color ORANGE = new Color (255,153,0);
+	private Color INDIGO = new Color (138,0,255);
 	private Font font;
 	public GamePanel(Game m){
 		mainFrame=m;
@@ -345,8 +346,17 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
     	g.drawImage(white,0,0,this);
     	g.drawImage(level.getMap(),camAdjust("X",0),camAdjust("Y",0),this);
     	ArrayList<Platform> tmpP = level.getPlats();
-    	for(int i =0;i< tmpP.size();i++){
-    		g.setColor(ORANGE);
+    	for(int i =0;i< tmpP.size();i++){ //DRAW PLATFORMS
+    		System.out.println("TYPE:"+tmpP.get(i).getType());
+    		System.out.println();
+    		if ((tmpP.get(i).getType()).equals("MOVING")==true){
+    			System.out.println("ORANGE");
+    			g.setColor(ORANGE);
+    		}
+    		if ((tmpP.get(i).getType()).equals("DROPPING")==true){
+    			System.out.println("INDIGO");
+    			g.setColor(INDIGO);
+    		}
     		g.fillRect(camAdjust("X",tmpP.get(i).getX()),camAdjust("Y",tmpP.get(i).getY()),tmpP.get(i).getWidth(),tmpP.get(i).getHeight());
     	}
     	Image pic=chara.getPic();

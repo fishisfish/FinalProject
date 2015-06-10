@@ -23,6 +23,7 @@ public class Person {
 	private ArrayList<ArrayList<ArrayList<Image>>> allPics = new ArrayList<ArrayList<ArrayList<Image>>>();
 	private ArrayList<ArrayList<Image>> leftPics = new ArrayList<ArrayList<Image>>();
 	private ArrayList<ArrayList<Image>> rightPics = new ArrayList<ArrayList<Image>>();
+	private ArrayList<Platform> platFall= new ArrayList<Platform>();
 	private String [] picNames = new String []{"Walk", "Jump", "Some", "Slid", "Swim", "Dead"};
 	private int [] frameTotal = new int []{0,0,0,0,0,0};
 	private Image temp= new ImageIcon("profile.png").getImage();
@@ -75,6 +76,7 @@ public class Person {
  	private double [] cptStartAngles={Math.toRadians(90),Math.toRadians(90)+Math.atan(13.0/22.0),Math.atan(22.0/10.0),Math.toRadians(180),-10000,0,Math.toRadians(270),Math.toRadians(180)+Math.atan(21.0/13.0),Math.toRadians(270)+Math.atan(10.0/21.0)};	
  	private Color BLUE = new Color (0,165,255);
 	private Color PURPLE = new Color (200,0,200);
+	private Color INDIGO = new Color (138,0,255);
 	private Color ORANGE = new Color (255,153,0);
 	private Color GREY = new Color(130,130,130);
 	private Color footColor;
@@ -278,16 +280,16 @@ public class Person {
 		    	else if (yVel<4&&yVel>=1){
 					return allPics.get(direction+1).get(2).get(2);
 		    	}
-		    	else if (yVel<1&&yVel>=-2){
+		    	else if (yVel<1&&yVel>=-1){
 					return allPics.get(direction+1).get(2).get(3);
 		    	}
-		    	else if (yVel<-2&&yVel>=-5){
+		    	else if (yVel<-1&&yVel>=-3){
 					return allPics.get(direction+1).get(2).get(4);
 		    	}
-		    	else if (yVel<-5&&yVel>=-8){
+		    	else if (yVel<-3&&yVel>=-5){
 					return allPics.get(direction+1).get(2).get(5);
 		    	}
-		    	else if (yVel<-8){
+		    	else if (yVel<=-6){
 					return allPics.get(direction+1).get(2).get(0);
 		    	}
 	    		
@@ -678,6 +680,9 @@ public class Person {
 	    			//	System.out.println("PLATE:      "+plat.getY());
 	    				xplatVel=plat.getxVel();
 	    				yplatVel=plat.getyVel();
+	    				if ((plat.getType()).equals("DROPPING")==true){
+	    					plat.fallPrepare();
+	    				}
 	    			}
 	    			
 	    		}
@@ -900,11 +905,14 @@ public class Person {
     				}
     				if (i==6&&inAir==true){
     					System.out.println("HITGROUND");
+    					if (fallCount>=500){
+    						die();
+    					}
     					hitGroundreset();
     					adjust(tempX,  y, 1, -22, "y", map);
     				}
 					if (xVel<0&&isSwimming==false&&clingPlat==false){
-						if ((i==1||i==3||i==7)&&WallHits[i]==true){
+						if ((i==1||i==3||i==7)&&WallHits[i]==true&&WallHits[6]==false){
 							adjust(x, tempY, -1, 14, "x", map);
 							runIntoWall=true;
 							lastPlat=null;
@@ -912,7 +920,7 @@ public class Person {
 						}
 					}
 					if (xVel>0&&isSwimming==false&&clingPlat==false){
-						if ((i==2||i==5||i==8)&&WallHits[i]==true){
+						if ((i==2||i==5||i==8)&&WallHits[i]==true&&WallHits[6]==false){
 							adjust(x, tempY, 1, -14, "x", map);
 							runIntoWall=true;
 							lastPlat=null;
@@ -936,7 +944,12 @@ public class Person {
     	yplatVel=0;
 
     	for(int i =0;i< tmpP.size();i++){
-    		g2.setColor(ORANGE);
+    		if ((tmpP.get(i).getType()).equals("MOVING")==true){
+    			g2.setColor(ORANGE);
+    		}
+    		if ((tmpP.get(i).getType()).equals("DROPPING")==true){
+    			g2.setColor(INDIGO);
+    		}
     		g2.fillRect(tmpP.get(i).getX(), tmpP.get(i).getY(),tmpP.get(i).getWidth(),tmpP.get(i).getHeight());
     		onPlat=checkPlatCollide(tmpP.get(i),onPlat);
 
@@ -1079,6 +1092,7 @@ public class Person {
     	tooDown=false;
     	walkCount=0;
     	picStall=0;
+    	fallCount=0;
     }
     public void checkCPoint(BufferedImage map, int i, int j){
     	ArrayList<int[]> checkPoints = level.getCheckPoints();

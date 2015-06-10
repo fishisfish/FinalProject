@@ -17,6 +17,11 @@ import java.util.LinkedList;
 public class Platform{
 	private int x,y,ox,oy,dx,dy,width,height,dir,vel;
 	private String [] data;
+	private String type;
+	private boolean falling=false;
+	private boolean willFall=false;
+	private int fallCount=0;
+	private int countDown=0;
 	public Platform(String line){
 		data = line.split(",");
 		x = Integer.parseInt(data[0]);
@@ -29,6 +34,8 @@ public class Platform{
 		dy = Integer.parseInt(data[5]);
 		dir = Integer.parseInt(data[6]);
 		vel = Integer.parseInt(data[7]);
+		type=data[8];
+		//System.out.println(data[8]);
 	}
 	public int getX(){;return x;}
 	public int getY(){return y;}
@@ -48,7 +55,14 @@ public class Platform{
 			return 0;
 		}
 		}
-	
+	public String getType(){
+		//System.out.println(type);
+		return type;
+	}
+	public void fallPrepare(){
+		countDown=5;	
+		willFall=true;
+	}
 	public int getWidth(){return width;}
 	public int getHeight(){return height;}
 	
@@ -76,7 +90,23 @@ public class Platform{
 				y += vel*dir;
 			}
 		}
-			
+		if (willFall==true){
+			countDown-=1;
+			if (countDown==0){
+				falling=true;
+				willFall=false;
+				countDown=0;
+			}
+		}
+		if (falling==true){
+			y+=6;
+			fallCount+=1;
+			if (fallCount==100){
+				falling=false;
+				fallCount=0;
+				y=oy;
+			}
+		}	
 	}
 	public String toString(){
 		return "{"+data[0]+","+data[1]+"}";
