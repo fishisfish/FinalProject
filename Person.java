@@ -76,6 +76,7 @@ public class Person {
  	private Color BLUE = new Color (0,165,255);
 	private Color PURPLE = new Color (200,0,200);
 	private Color ORANGE = new Color (255,153,0);
+	private Color GREY = new Color (130,130,130);
 	private Color footColor;
 	private Level level;
 	private BufferedImage movingStuff;
@@ -277,16 +278,16 @@ public class Person {
 		    	else if (yVel<4&&yVel>=1){
 					return allPics.get(direction+1).get(2).get(2);
 		    	}
-		    	else if (yVel<1&&yVel>=-2){
+		    	else if (yVel<1&&yVel>=-1){
 					return allPics.get(direction+1).get(2).get(3);
 		    	}
-		    	else if (yVel<-2&&yVel>=-5){
+		    	else if (yVel<-1&&yVel>=-3){
 					return allPics.get(direction+1).get(2).get(4);
 		    	}
-		    	else if (yVel<-5&&yVel>=-8){
+		    	else if (yVel<-3&&yVel>=-5){
 					return allPics.get(direction+1).get(2).get(5);
 		    	}
-		    	else if (yVel<-8){
+		    	else if (yVel<=-6){
 					return allPics.get(direction+1).get(2).get(0);
 		    	}
 	    		
@@ -530,8 +531,8 @@ public class Person {
     		}
     		if (temp=="DOWN"){
     			if (canSwim(ang, -1, map)==true){
-	    			x=x-(int)(3*Math.cos(ang));
-	    			y=y+(int)(3*Math.sin(ang));
+	    			x=x-(int)(1*Math.cos(ang));
+	    			y=y+(int)(1*Math.sin(ang));
 	    			System.out.println("DOWN");
     			}
     			swimDir=-1; 
@@ -613,7 +614,7 @@ public class Person {
     	for (int i=0;i<9;i++){
     		int [] tmp= rotatedPoints[i];
     		Color c = new Color (map.getRGB(tempX+tmp[0],tempY+tmp[1]));
-    		if (c.equals(Color.GREEN)==true){
+    		if (c.equals(GREY)==true){
     			//System.out.println("ISSWIMATWALL");
     			//System.out.println(y+tmp[1]);
     			//System.out.println(y);
@@ -782,14 +783,14 @@ public class Person {
 		while (true){
 			if (temp=="y"){
 				Color c2= new Color (map.getRGB(tx,ty+j*dir));
-				if (c2.equals(Color.GREEN)==true){
+				if (c2.equals(GREY)==true){
 					 y=y+num+j*dir;
 					 break;
 				}
 			}
 			else if (temp=="x"){
 				Color c2= new Color (map.getRGB(tx+j*dir,ty));
-				if (c2.equals(Color.GREEN)==true){
+				if (c2.equals(GREY)==true){
 					 x=x+num+j*dir;
 					 break;
 				}
@@ -819,10 +820,10 @@ public class Person {
 			Color cR = new Color (map.getRGB(tempRx,tempRy));
 			Color cL = new Color (map.getRGB(tempLx,tempLy));
 
-			if (cR.equals(Color.GREEN)==true){
+			if (cR.equals(GREY)==true){
 				waterWallhitCount=swimWall ( tempRx,  tempRy,  i, RIGHT, waterWallhitCount);
 			}
-			if (cL.equals(Color.GREEN)==true){
+			if (cL.equals(GREY)==true){
 				waterWallhitCount=swimWall ( tempLx,  tempLy,  i, LEFT, waterWallhitCount);
 			}
 				
@@ -840,7 +841,7 @@ public class Person {
 					x+=direction*-1*1;	
 				}
 			}
-			if (cS.equals(BLUE)==false&&cS.equals(Color.GREEN)==false){
+			if (cS.equals(BLUE)==false&&cS.equals(GREY)==false){
 				
     			System.out.println("GETOUT");
     			leavingWater=true;
@@ -867,7 +868,7 @@ public class Person {
 			//	die();
 			}
 			else{
-    			WallHits[i]=c.equals(Color.GREEN);
+    			WallHits[i]=c.equals(GREY);
     			MovingStuffHits[i]=cM.equals(ORANGE);
     			
     			if (i==6){
@@ -880,7 +881,7 @@ public class Person {
     						isClinging=false;
 							lastPlat=null;
     					}
-    					if (c.equals(Color.GREEN)==false&&isSwimming==false&&isSinking==false&&onPlat==false){
+    					if (c.equals(GREY)==false&&isSwimming==false&&isSinking==false&&onPlat==false){
     						inAir=true;
     						isSliding=false;
     						
@@ -889,7 +890,7 @@ public class Person {
     			}
     			
     			
-    			if (c.equals(Color.GREEN)==true){
+    			if (c.equals(GREY)==true){
     				
     				if (i==0&&inAir==true){
     					System.out.println("HITHEAD");
@@ -899,11 +900,14 @@ public class Person {
     				}
     				if (i==6&&inAir==true){
     					System.out.println("HITGROUND");
+    					if (fallCount>=500){
+    						die();
+    					}
     					hitGroundreset();
     					adjust(tempX,  y, 1, -22, "y", map);
     				}
 					if (xVel<0&&isSwimming==false&&clingPlat==false){
-						if ((i==1||i==3||i==7)&&WallHits[i]==true){
+						if ((i==1||i==3||i==7)&&WallHits[i]==true&&WallHits[6]==false){
 							adjust(x, tempY, -1, 14, "x", map);
 							runIntoWall=true;
 							lastPlat=null;
@@ -911,7 +915,7 @@ public class Person {
 						}
 					}
 					if (xVel>0&&isSwimming==false&&clingPlat==false){
-						if ((i==2||i==5||i==8)&&WallHits[i]==true){
+						if ((i==2||i==5||i==8)&&WallHits[i]==true&&WallHits[6]==false){
 							adjust(x, tempY, 1, -14, "x", map);
 							runIntoWall=true;
 							lastPlat=null;
@@ -1076,6 +1080,7 @@ public class Person {
     	tooDown=false;
     	walkCount=0;
     	picStall=0;
+    	fallCount=0;
     }
     /*public boolean checkHor(){
     //checks collision in the horizontal
