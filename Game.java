@@ -345,23 +345,32 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
     	Graphics2D g2 = (Graphics2D)g;
     	g.drawImage(white,0,0,this);
     	g.drawImage(level.getMap(),camAdjust("X",0),camAdjust("Y",0),this);
+    	g.drawRect(camAdjust("X",chara.getX()-15),camAdjust("Y",chara.getY())-25,30,45);
     	ArrayList<Platform> tmpP = level.getPlats();
     	for(int i =0;i< tmpP.size();i++){ //DRAW PLATFORMS
-    		System.out.println("TYPE:"+tmpP.get(i).getType());
-    		System.out.println();
+    	//	System.out.println("TYPE:"+tmpP.get(i).getType());
+    	//	System.out.println();
     		if ((tmpP.get(i).getType()).equals("MOVING")==true){
-    			System.out.println("ORANGE");
+    		//	System.out.println("ORANGE");
     			g.setColor(ORANGE);
     		}
     		if ((tmpP.get(i).getType()).equals("DROPPING")==true){
-    			System.out.println("INDIGO");
+    		//	System.out.println("INDIGO");
     			g.setColor(INDIGO);
     		}
     		g.fillRect(camAdjust("X",tmpP.get(i).getX()),camAdjust("Y",tmpP.get(i).getY()),tmpP.get(i).getWidth(),tmpP.get(i).getHeight());
     	}
+    	ArrayList<Image> checkPics = level.getCheckPics();
+		ArrayList<int[]> checkPoints = level.getCheckPoints();
+		for (int i=0;i < checkPics.size();i++){
+			if(level.getCheckPassed().get(i) == true){
+				g.drawImage(checkPics.get(i),camAdjust("X",0),camAdjust("Y",0),this);
+				System.out.println("it worksssssssssssssssssss:       "+i);
+			}
+		}
     	Image pic=chara.getPic();
     	if (chara.getSwim()==false){
-    		g.drawRect(camAdjust("X",chara.getX()-15),camAdjust("Y",chara.getY())-25,30,45);
+    		
     		if (chara.getCling()==false){
 	    		g.drawImage(pic,camAdjust("X",chara.getX()-(int)(pic.getWidth(null)/2)),camAdjust("Y",chara.getY()-(int)(pic.getHeight(null)/2)),this);
     		}
@@ -389,14 +398,7 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 			//}
 			
     	}
-    	ArrayList<Image> checkPics = level.getCheckPics();
-		ArrayList<int[]> checkPoints = level.getCheckPoints();
-		for (int i=0;i < checkPics.size();i++){
-			if(level.getCheckPassed().get(i) == true){
-				g.drawImage(checkPics.get(i),camAdjust("X",0),camAdjust("Y",0),this);
-				System.out.println("it worksssssssssssssssssss");
-			}
-		}
+    	
     	g.setFont(font); 
 		g.setColor(Color.BLACK);
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON); //makes the font pretty when its drawn
