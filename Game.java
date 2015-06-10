@@ -389,6 +389,14 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 			//}
 			
     	}
+    	ArrayList<Image> checkPics = level.getCheckPics();
+		ArrayList<int[]> checkPoints = level.getCheckPoints();
+		for (int i=0;i < checkPics.size();i++){
+			if(level.getCheckPassed().get(i) == true){
+				g.drawImage(checkPics.get(i),camAdjust("X",0),camAdjust("Y",0),this);
+				System.out.println("it worksssssssssssssssssss");
+			}
+		}
     	g.setFont(font); 
 		g.setColor(Color.BLACK);
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON); //makes the font pretty when its drawn
