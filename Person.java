@@ -786,6 +786,16 @@ public class Person {
 	public void adjust(int tx, int ty, int dir, int num, String temp, BufferedImage map){
 		int j=0;
 		while (true){
+			if (j==20){
+				if (temp=="y"){
+					y=y+num+j*dir;
+				}
+				else if (temp=="x"){
+					x=x+num+j*dir;
+				}
+				break;
+			}
+			
 			if (temp=="y"){
 				Color c2= new Color (map.getRGB(tx,ty+j*dir));
 				if (c2.equals(GREY)==true){
