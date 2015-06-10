@@ -19,7 +19,7 @@ import java.io.*;
 import java.util.Scanner;
 import java.util.LinkedList;
 public class Game extends JFrame implements ActionListener {
-	Timer myTimer;
+	Timer myTimer,clockTimer;
  	GamePanel map;
  	public Game() {  //setting up graphic bits
  		super("Game");
@@ -30,6 +30,7 @@ public class Game extends JFrame implements ActionListener {
  		map.setSize(800,600);
  		add(map);
  		myTimer = new Timer(10,this);
+ 		clockTimer = new Timer (1000,this);
  		setResizable(false);
  		setVisible(true);
  		
@@ -39,13 +40,22 @@ public class Game extends JFrame implements ActionListener {
 	}
     public void start(){
     	myTimer.start();
+    	clockTimer.start();
     }
     public void actionPerformed(ActionEvent evt){
     	Object source = evt.getSource();
+    	if (source==clockTimer){
+    		System.out.println("CLOCKCLOCKCLOCKCLOCK");
+    		map.second();
+    	}
     	if (source==myTimer){
     		map.move();
+    		map.repaint();
     	}
-		map.repaint();
+    	
+    		
+    	
+		
     }
 
 }
@@ -62,11 +72,14 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 	private boolean jumpOff;
 	private Person chara;
 	private Level level;
+	private int timePassed=0;
 	private static final int RIGHT=1;
 	private static final int LEFT=-1;
 	private Color ORANGE = new Color (255,153,0);
+	private Font font;
 	public GamePanel(Game m){
 		mainFrame=m;
+		load();
 		mosX=0;
 		mosY=0;
 		
@@ -85,7 +98,19 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 		addKeyListener(this);
 		
 	}
-	public static int chooseLevel(){
+	public void load(){
+		try { //loading the font
+			File file=new File("kirbyss.ttf");
+			font = Font.createFont(Font.TRUETYPE_FONT, file);
+     		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+     		ge.registerFont(font);
+     		font=font.deriveFont(Font.PLAIN,25);
+     		//fontpts=font.deriveFont(Font.PLAIN,20);
+			} 
+		catch (IOException|FontFormatException e) {
+			}
+	}
+	public int chooseLevel(){
 		Scanner kb = new Scanner(System.in);
 		System.out.println("Choose a level:");
 		int lev = kb.nextInt();
@@ -97,7 +122,25 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 		moveChara();
 		
 	} 
+	public void second(){
+		timePassed+=1;	
+	}
+	public String getTime(int time){
+		int sec=time%60;
+		String sSec=sec+"";
+		if (sec<10){
+			 sSec="0"+sSec;
+		}
+		int min=time/60;
+		String sMin=min+"";
+		if (min<10){
+			 sMin="0"+sMin;
+		}
+		String tmp = sMin+":"+sSec;
+		return tmp;
+	}
 	public void moveChara(){
+		//getTime(timePassed);
 		if (chara.getleavingWater()==true){
 				//	System.out.println("LEFTWATER");
 					canSome=false;
@@ -297,9 +340,8 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
     }
     @Override
     public void paintComponent(Graphics g){
+    	Graphics2D g2 = (Graphics2D)g;
     	g.drawImage(white,0,0,this);
-    	
-    	
     	g.drawImage(level.getMap(),camAdjust("X",0),camAdjust("Y",0),this);
     	ArrayList<Platform> tmpP = level.getPlats();
     	for(int i =0;i< tmpP.size();i++){
@@ -334,6 +376,10 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 			//	System.out.println(point[0]);
 			//	System.out.println(point[1]);
 			//}
+			g.setFont(font); 
+			g.setColor(Color.BLACK);
+        	g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON); //makes the font pretty when its drawn
+			g.drawString(getTime(timePassed),camAdjust("X",400),camAdjust("Y",300));
     	}
     }
     public void mouseReleased(MouseEvent e){
