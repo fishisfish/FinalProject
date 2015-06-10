@@ -16,8 +16,9 @@ import java.util.LinkedList;
 
 public class Platform{
 	private int x,y,ox,oy,dx,dy,width,height,dir,vel;
+	private String [] data;
 	public Platform(String line){
-		String [] data = line.split(",");
+		data = line.split(",");
 		x = Integer.parseInt(data[0]);
 		y = Integer.parseInt(data[1]);
 		ox = x;
@@ -29,8 +30,25 @@ public class Platform{
 		dir = Integer.parseInt(data[6]);
 		vel = Integer.parseInt(data[7]);
 	}
-	public int getX(){return x;}
+	public int getX(){;return x;}
 	public int getY(){return y;}
+	public int getxVel(){
+		if (dx!=0){
+			return vel*dir;
+		}
+		else{
+			return 0;
+		}
+	}
+	public int getyVel(){
+		if (dy!=0){
+			return vel*dir;
+		}
+		else{
+			return 0;
+		}
+		}
+	
 	public int getWidth(){return width;}
 	public int getHeight(){return height;}
 	
@@ -53,11 +71,15 @@ public class Platform{
 				//System.out.println("VELOCITY: " + velo + "\nDIRECTION")
 			}
 			else{
+			//	System.out.println("BLLOP");
 				dir*=-1;
 				y += vel*dir;
 			}
 		}
 			
+	}
+	public String toString(){
+		return "{"+data[0]+","+data[1]+"}";
 	}
 	
 	
