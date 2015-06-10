@@ -60,8 +60,11 @@ public class Platform{
 		return type;
 	}
 	public void fallPrepare(){
-		countDown=5;	
-		willFall=true;
+		if (willFall==false){
+			countDown=5;	
+			willFall=true;
+		}
+		
 	}
 	public int getWidth(){return width;}
 	public int getHeight(){return height;}

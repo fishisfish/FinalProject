@@ -138,7 +138,7 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 			 sMin="0"+sMin;
 		}
 		String tmp = sMin+":"+sSec;
-		System.out.println(tmp);
+		//System.out.println(tmp);
 		return tmp;
 	}
 	public void moveChara(){
@@ -365,7 +365,7 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 		for (int i=0;i < checkPics.size();i++){
 			if(level.getCheckPassed().get(i) == true){
 				g.drawImage(checkPics.get(i),camAdjust("X",0),camAdjust("Y",0),this);
-				System.out.println("it worksssssssssssssssssss:       "+i);
+				//System.out.println("it worksssssssssssssssssss:       "+i);
 			}
 		}
     	Image pic=chara.getPic();
