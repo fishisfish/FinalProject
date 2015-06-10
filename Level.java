@@ -10,11 +10,16 @@ import javax.imageio.ImageIO;
 import java.util.ArrayList;
 import java.io.*;
 import java.util.Scanner;
+import java.awt.Image;
+import javax.swing.*;
+import javax.swing.JPanel.*;
 
 public class Level {
 	private BufferedImage map;
 	private ArrayList<Platform> movingPlats = new ArrayList<Platform>();
-	private ArrayList<>
+	private ArrayList<Image> checkPics = new ArrayList<Image>();
+	private ArrayList<int[]> checkPoints = new ArrayList<int[]>();
+	private ArrayList<Boolean> checkPointsPassed = new ArrayList<Boolean>();
 	private int width,height,dropx,dropy,direction;
     public Level(int lev) {
     	String levelNum = lev + "";
@@ -45,6 +50,19 @@ public class Level {
     		Platform tmp = new Platform(line);
     		movingPlats.add(tmp);
     	}
+    	//load checkpoints
+    	int num2 = Integer.parseInt(infile.nextLine());
+    	for (int i = 0; i<num2;i++){
+    		String line = infile.nextLine();
+    		String [] data = line.split(",");
+    		int x = Integer.parseInt(data[0]);
+			int y = Integer.parseInt(data[1]);
+			int [] temp = {x,y};
+			checkPoints.add(temp);
+			String j = i + "";
+			checkPics.add(new ImageIcon("Images/Maps/"+levelNum+"/"+j+".png").getImage());
+			checkPointsPassed.add(false);
+    	}
     	//load traps								<=============to be completed
     }
     public BufferedImage getMap(){
@@ -52,6 +70,19 @@ public class Level {
     }
     public ArrayList<Platform> getPlats(){
     	return movingPlats;
+    }
+    public ArrayList<Image> getCheckPics(){
+    	return checkPics;
+    }
+    public ArrayList<int[]> getCheckPoints(){
+    	return checkPoints;
+    }
+    public ArrayList<Boolean> getCheckPassed(){
+    	return checkPointsPassed;
+    }
+    public void setCheckPassed(int num){
+    	checkPointsPassed.set(num,true);
+    	System.out.println("changed");
     }
     public int getWidth(){return width;}
     public int getHeight(){return height;}

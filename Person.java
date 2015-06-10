@@ -983,7 +983,9 @@ public class Person {
 
     	for (int i=0;i<9;i++){
     		int tempX,tempY;
-
+    		for (int j=0;j<level.getCheckPoints().size();j++){
+    			checkCPoint(map,i,j);
+    		}
     		if(x+rotatedPoints[i][0] <= levelSizeX && x+rotatedPoints[i][0] >=0 && y+rotatedPoints[i][1] <= levelSizeY && y+rotatedPoints[i][1] >=0){
 				if (isSwimming==true){
 					waterWallhitCount=swimCheckStuff(i, waterWallhitCount, map);
@@ -1077,6 +1079,20 @@ public class Person {
     	tooDown=false;
     	walkCount=0;
     	picStall=0;
+    }
+    public void checkCPoint(BufferedImage map, int i, int j){
+    	ArrayList<int[]> checkPoints = level.getCheckPoints();
+    	if ((new Color(map.getRGB(x+contactPoints[i][0],y+contactPoints[i][1]))).equals(Color.BLACK)){
+    		if (x+contactPoints[i][0] > checkPoints.get(j)[0] && x+contactPoints[i][0] < checkPoints.get(j)[0]+30 && y+contactPoints[i][1] > checkPoints.get(j)[1] && y+contactPoints[i][1] < checkPoints.get(j)[1]+30){
+    			/*if (level.getCheckPassed().get(j)!= false){
+    				
+    			}*/
+    			level.setCheckPassed(j);
+    			System.out.println("CHECK POINT PASSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSED");
+    		}
+    		
+    		
+    	}
     }
     /*public boolean checkHor(){
     //checks collision in the horizontal
