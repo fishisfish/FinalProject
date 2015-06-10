@@ -76,7 +76,7 @@ public class Person {
  	private Color BLUE = new Color (0,165,255);
 	private Color PURPLE = new Color (200,0,200);
 	private Color ORANGE = new Color (255,153,0);
-	private Color GREY = new Color (130,130,130);
+	private Color GREY = new Color(130,130,130);
 	private Color footColor;
 	private Level level;
 	private BufferedImage movingStuff;
