@@ -65,6 +65,7 @@ public class Person {
     private boolean onPlat=false;
     private boolean clingPlat=false;
     private boolean wasClingP=false;
+    private boolean edgeCling=false;
     private boolean[] WallHits = new boolean[9];
     private boolean[] MovingStuffHits = new boolean[9];
     private boolean [] wallHitinWater = new boolean [9];
@@ -438,28 +439,21 @@ public class Person {
     	}
     }
     public void gravity(){
-    //	System.out.println(isClinging);
-    //	System.out.println("CLINGP"+clingPlat);
-    //	System.out.println("GRAVITY");
     	if (inAir == true){
     	xVel=Math.abs(xVel)*direction;
-    //	System.out.println("yVEL1:"+yVel);
-    	//System.out.println(y);
-    	//	System.out.println("FALL");
     		if (yVel>0){
-    		//	System.out.println(isClinging);
-    		//	System.out.println(clingPlat);
-    			if(isClinging==false&&clingPlat==false){
-    				
+    			if(isClinging==false&&clingPlat==false){	
     				yVel-=0.55;
-    				
     			}
     			else{
-    				//yVel=Math.min(0,yVel);
-    				yVel=Math.max(-3,yVel-clingCoefficient);
-    			//	System.out.println("yVel1"+yVel);
+    				if (edgeCling==false){
+    					yVel=Math.max(-3,yVel-clingCoefficient);	
+    				}
+    				else if (edgeCling==true){
+    					yVel=0;
+    				}
+
     			}
-    			
     		}
     		else if (yVel==0&&hitHead==true){
     			y+=1;
@@ -471,8 +465,12 @@ public class Person {
     			//	System.out.println("yVEL2:"+yVel);
     			}
     			else{
-    			//	System.out.println("yVEL2:"+yVel);
+    				if (edgeCling==false){
     				yVel=Math.max(-3,yVel-clingCoefficient);
+    				}
+    				else if (edgeCling==true){
+    					yVel=0;
+    				}
     			//	System.out.println("yVEL3:"+yVel);
     			}
     			if (propel==true){
@@ -480,10 +478,8 @@ public class Person {
     			}
     		}
     	}
-    //	System.out.println("YB:: "+y);
     	y=(int)(y-yVel);
     	y=(Math.max(25,y));
-    	//System.out.println("YA:: "+y);
    
     	if (y<apex){
     		apex=y;
@@ -565,20 +561,30 @@ public class Person {
     	}
     		
     }
-    public void cling(){
-    	if (((direction*xVel>0&&isSinking==false&&(direction==RIGHT&&checkWallCling(RIGHT)==true||direction==LEFT&&checkWallCling(LEFT)==true))||(xVel==0&&(direction==LEFT&&checkWallCling(LEFT)==true)||(direction==RIGHT&&checkWallCling(RIGHT)==true)))&&(doSome==false||doSome==true&&(lastWallx!=x+15*direction)||lastPlat!=null)){
-			System.out.println("CLING-NOT WA::");
-			yVel=Math.min(yVel,0);
-		//	yVel=0;
-		//	System.out.println("yVEL3:"+yVel);
-			xVel=0;
-			isWalking=false;
-			isClinging=true;
-			doSome=false;
-			lastPlat=null;
-			lastWallx=x+15*direction;
-			apex=y;
-			}
+    public void cling(BufferedImage map){
+    		Color c1=new Color(map.getRGB(x-15,y-24));
+    		Color c2=new Color(map.getRGB(x+15,y-24));	
+    	if ((direction==LEFT&&c1.equals(GREY))||(direction==RIGHT&&c2.equals(GREY))){
+    		Color c3=new Color(map.getRGB(x-15,y-28));
+    		Color c4=new Color(map.getRGB(x+15,y-28));
+    		if (c3.equals(GREY)==false&&direction==LEFT||c4.equals(GREY)==false&&direction==RIGHT){
+    			edgeCling=true;
+    			System.out.println("EDGECLING");
+    		}
+	    	if (((direction*xVel>0&&isSinking==false&&(direction==RIGHT&&checkWallCling(RIGHT)==true||direction==LEFT&&checkWallCling(LEFT)==true))||(xVel==0&&(direction==LEFT&&checkWallCling(LEFT)==true)||(direction==RIGHT&&checkWallCling(RIGHT)==true)))&&(doSome==false||doSome==true&&(lastWallx!=x+15*direction)||lastPlat!=null)){
+				//System.out.println("CLING-NOT WA::");
+				yVel=Math.min(yVel,0);
+			//	yVel=0;
+			//	System.out.println("yVEL3:"+yVel);
+				xVel=0;
+				isWalking=false;
+				isClinging=true;
+				doSome=false;
+				lastPlat=null;
+				lastWallx=x+15*direction;
+				apex=y;
+				}
+    	}
     }
     public void checkWalking(boolean temp){
     	isWalking=temp;
@@ -617,17 +623,6 @@ public class Person {
     		int [] tmp= rotatedPoints[i];
     		Color c = new Color (map.getRGB(tempX+tmp[0],tempY+tmp[1]));
     		if (c.equals(GREY)==true){
-    			//System.out.println("ISSWIMATWALL");
-    			//System.out.println(y+tmp[1]);
-    			//System.out.println(y);
-    		/*	if (y+tmp[1]<=y){
-    				System.out.println("TURN-UP");
-    				headAngle+=1;
-    			}
-    			if (y+tmp[1]>y){
-    				System.out.println("TURN-DOWN");
-    				headAngle-=1;
-    			}*/
     			System.out.println("CAN'T");
     			return false;
     		}
@@ -786,6 +781,15 @@ public class Person {
 	public void adjust(int tx, int ty, int dir, int num, String temp, BufferedImage map){
 		int j=0;
 		while (true){
+			if (j == 20){
+				if(temp=="y"){
+					y=y+num+j*dir;
+				}
+				else if (temp =="x"){
+					x=x+num+j*dir;
+				}
+				break;
+			}
 			if (temp=="y"){
 				Color c2= new Color (map.getRGB(tx,ty+j*dir));
 				if (c2.equals(GREY)==true){
@@ -914,6 +918,7 @@ public class Person {
 					if (xVel<0&&isSwimming==false&&clingPlat==false){
 						if ((i==1||i==3||i==7)&&WallHits[i]==true&&WallHits[6]==false){
 							adjust(x, tempY, -1, 14, "x", map);
+							System.out.println("ADJUSTL");
 							runIntoWall=true;
 							lastPlat=null;
 
@@ -922,6 +927,7 @@ public class Person {
 					if (xVel>0&&isSwimming==false&&clingPlat==false){
 						if ((i==2||i==5||i==8)&&WallHits[i]==true&&WallHits[6]==false){
 							adjust(x, tempY, 1, -14, "x", map);
+							System.out.println("ADJUSTR");
 							runIntoWall=true;
 							lastPlat=null;
 						}	
@@ -975,6 +981,7 @@ public class Person {
     	}
 	}
     public void checkHit(BufferedImage map){
+    	edgeCling=false;
     	runIntoWall = false;
     	hitHead = false;
     	hitGround=false;
@@ -1021,17 +1028,8 @@ public class Person {
     		runIntoWall=true;
     	}
     	g2.dispose();
-    	String a="";
-    	String b="";
-    	if (onPlat==true){
+
     	
-	    	for (int i=0;i<9;i++){
-	    		//a+="["+WallHits[i]+"] ";
-	    		b+="["+MovingStuffHits[i]+"] ";
-	    	}
-	    	System.out.println(a);
-	    	System.out.println(b);
-    	}
     	if ((WallHits[0]==true||MovingStuffHits[0]==true)&&(WallHits[6]==true||MovingStuffHits[6]==true)){//amy waz here
     		die();	//death by squishing between two platforms (vertical)
     	}
@@ -1042,7 +1040,7 @@ public class Person {
     	else{
     		if (inAir==true&&isSwimming==false&&footColor.equals(BLUE)==false){
     		//	System.out.println("CLINGG");
-				cling();
+				cling(map);
 			}
     	}
     	if (waterWallhitCount>=2){

@@ -59,7 +59,8 @@ public class Level {
 			int y = Integer.parseInt(data[1]);
 			int [] temp = {x,y};
 			checkPoints.add(temp);
-			String j = i + "";
+			int j = i + 1;
+			System.out.println("Maps/"+levelNum+"/"+j+".png");
 			checkPics.add(new ImageIcon("Maps/"+levelNum+"/"+j+".png").getImage());
 			checkPointsPassed.add(false);
     	}
