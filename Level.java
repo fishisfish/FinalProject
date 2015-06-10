@@ -60,7 +60,7 @@ public class Level {
 			int [] temp = {x,y};
 			checkPoints.add(temp);
 			String j = i + "";
-			checkPics.add(new ImageIcon("Images/Maps/"+levelNum+"/"+j+".png").getImage());
+			checkPics.add(new ImageIcon("Maps/"+levelNum+"/"+j+".png").getImage());
 			checkPointsPassed.add(false);
     	}
     	//load traps								<=============to be completed
