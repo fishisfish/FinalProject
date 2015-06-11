@@ -17,12 +17,16 @@ import javax.swing.JPanel.*;
 public class Level {
 	private BufferedImage map;
 	private ArrayList<Platform> movingPlats = new ArrayList<Platform>();
+	private ArrayList<Traps> traps = new ArrayList<Traps>();
 	private ArrayList<Image> checkPics = new ArrayList<Image>();
 	private ArrayList<int[]> checkPoints = new ArrayList<int[]>();
 	private ArrayList<Boolean> checkPointsPassed = new ArrayList<Boolean>();
 	private int width,height,dropx,dropy,direction;
+	private Scanner infile = null;
+    private	Scanner trapfile = null;
+    String levelNum="";
     public Level(int lev) {
-    	String levelNum = lev + "";
+    	levelNum = lev + "";
     	//import map as BufferedImage
     	try{
 			map= ImageIO.read(new File("Maps/Act "+ levelNum+".png"));
@@ -30,15 +34,32 @@ public class Level {
 		catch(IOException e){
 			System.out.println("map loading problem");
 		}
-    	Scanner infile = null;
+    	infile = null;
+    	trapfile = null;
     	//loading map info text file
     	try{
     		infile=new Scanner(new File("Maps/"+levelNum+".txt"));
+    		trapfile=new Scanner(new File("Images/Interactives/"+levelNum+".txt"));
     			
     	}
     	catch(IOException ex){
     		System.out.println("level textfile problem");
     	}
+    	loadPlat();
+    	//load checkpoints
+    	loadCP();
+    	//load traps
+    	loadTrap();							//	<=============to be completed
+    }
+    public void loadTrap(){
+    	int num=Integer.parseInt(trapfile.nextLine());
+    	for (int i = 0; i<num;i++){
+    		String line = trapfile.nextLine();
+			Traps tmp=new Traps(line);
+			traps.add(tmp);
+    	}
+    }
+    public void loadPlat(){
     	direction = Integer.parseInt(infile.nextLine());
     	width = Integer.parseInt(infile.nextLine());
     	height = Integer.parseInt(infile.nextLine());
@@ -50,7 +71,8 @@ public class Level {
     		Platform tmp = new Platform(line);
     		movingPlats.add(tmp);
     	}
-    	//load checkpoints
+    }
+    public void loadCP(){
     	int num2 = Integer.parseInt(infile.nextLine());
     	for (int i = 0; i<num2;i++){
     		String line = infile.nextLine();
@@ -64,13 +86,15 @@ public class Level {
 			checkPics.add(new ImageIcon("Maps/"+levelNum+"/"+j+".png").getImage());
 			checkPointsPassed.add(false);
     	}
-    	//load traps								<=============to be completed
     }
     public BufferedImage getMap(){
     	return map;
     }
     public ArrayList<Platform> getPlats(){
     	return movingPlats;
+    }
+    public ArrayList<Traps> getTraps(){
+    	return traps;
     }
     public ArrayList<Image> getCheckPics(){
     	return checkPics;
@@ -83,7 +107,7 @@ public class Level {
     }
     public void setCheckPassed(int num){
     	checkPointsPassed.set(num,true);
-    //	System.out.println("changed");
+    	System.out.println("changed");
     }
     public int getWidth(){return width;}
     public int getHeight(){return height;}
@@ -93,6 +117,11 @@ public class Level {
     public void movePlatforms(){
     	for (int i=0;i<movingPlats.size();i++){
     		movingPlats.get(i).move();
+    	}
+    }
+    public void moveTraps(){
+    	for (int i=0;i<traps.size();i++){
+    		traps.get(i).move();
     	}
     }
 }

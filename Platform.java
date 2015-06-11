@@ -20,8 +20,11 @@ public class Platform{
 	private String type;
 	private boolean falling=false;
 	private boolean willFall=false;
+	private boolean isBouncing=false;
 	private int fallCount=0;
 	private int countDown=0;
+	private int squishCount=0;
+	private int bounceVel;
 	public Platform(String line){
 		data = line.split(",");
 		x = Integer.parseInt(data[0]);
@@ -35,6 +38,7 @@ public class Platform{
 		dir = Integer.parseInt(data[6]);
 		vel = Integer.parseInt(data[7]);
 		type=data[8];
+		bounceVel= Integer.parseInt(data[9]);
 		//System.out.println(data[8]);
 	}
 	public int getX(){;return x;}
@@ -66,6 +70,15 @@ public class Platform{
 		}
 		
 	}
+	public void bounce(){
+		isBouncing=true;
+	}
+	public int getbVel(){
+		return bounceVel;
+	}
+	public int getsquishCount(){
+		return squishCount;
+	}
 	public int getWidth(){return width;}
 	public int getHeight(){return height;}
 	
@@ -81,7 +94,7 @@ public class Platform{
 				x += vel*dir;
 			}
 		}
-		else{
+		else if (dy!=0){
 			if ((y-oy)*dir<dy){
 				y += vel*dir;
 				String velo = vel+"";
@@ -109,6 +122,25 @@ public class Platform{
 				fallCount=0;
 				y=oy;
 			}
+		}
+		if (isBouncing==true){
+			if (squishCount<=15){
+				y+=1;
+				height-=1;
+				if (squishCount==15){
+					dir*=-1;
+				}
+			}
+			
+			else if (squishCount>15&&squishCount<=30){
+				y-=1;
+				height+=1;
+			}
+			else{
+				squishCount=0;
+				isBouncing=false;
+			}
+			squishCount+=1;
 		}	
 	}
 	public String toString(){

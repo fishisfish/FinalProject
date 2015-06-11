@@ -9,6 +9,7 @@
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.Image;
+import java.awt.geom.*;
 import java.awt.image.BufferedImage;
 import java.awt.Color;
 import javax.swing.*;
@@ -38,6 +39,7 @@ public class Person {
 	private int xplatVel=0;
     private int	yplatVel=0;
     private int fallCount=0;
+    private int bounceVel;
 	private static final int RIGHT=1;
 	private static final int LEFT=-1;
 	private boolean inAir=false;
@@ -47,7 +49,7 @@ public class Person {
 	private boolean isCrouching=false;
 	private boolean isSwimming=false;
 	private boolean isClinging=false;
-	private boolean bouncing=false;
+	private boolean isBouncing=false;
 	private boolean gotDown=false;
     private boolean runIntoWall=false;
     private boolean hitGround=false;
@@ -67,6 +69,7 @@ public class Person {
     private boolean wasClingP=false;
     private boolean edgeCling=false;
     private boolean pushedPlat=false;
+    private boolean death=false;
     private boolean[] WallHits = new boolean[9];
     private boolean[] MovingStuffHits = new boolean[9];
     private boolean [] wallHitinWater = new boolean [9];
@@ -81,6 +84,7 @@ public class Person {
 	private Color INDIGO = new Color (138,0,255);
 	private Color ORANGE = new Color (255,153,0);
 	private Color GREY = new Color(130,130,130);
+	private Color YELLOW = new Color(255,252,118);
 	private Color footColor;
 	private Level level;
 	private BufferedImage movingStuff;
@@ -98,6 +102,7 @@ public class Person {
     	yVel=0;
     	jumpVel=11;
     	propelVel=12;
+    	bounceVel=20;
     	headAngle=90;
     	walkCount=0;
     	picStall=0;
@@ -224,6 +229,9 @@ public class Person {
     public int [][] getPoints(){
     	return rotatedPoints;
     }
+    public boolean getDeath(){
+    	return death;
+    }
     public Image getPic(){
     	if (isSwimming==true&&isSinking==false){
     		if (stopSwim>0){
@@ -272,7 +280,7 @@ public class Person {
 	    	}
 	    	return allPics.get(direction+1).get(0).get(walkCount);
 	    }
-	    if (inAir==true && bouncing==false){
+	    if (inAir==true){
 	    	if (doSome==true){
 	    		if (yVel<=10&&yVel>=7){
 		    		allPics.get(direction+1).get(2).get(0);
@@ -376,7 +384,7 @@ public class Person {
     	}	
     }
     public boolean jump(){
-    //	System.out.println("JUMP FUNCTION CALLED. AAAA");
+    	System.out.println("JUMP FUNCTION CALLED. AAAA");
     	if (inAir==false){//||isClinging==true||clingPlat==true){
     		System.out.println("JUMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMP");
     		isCrouching=false;
@@ -384,10 +392,16 @@ public class Person {
     		isClinging=false;
     		clingPlat=false;
     		wasClingP=false;
-    		if (propel==true){
+    		if (isBouncing==true){
+    			System.out.println("BOUUUUUUUUUUUUUUNCE");
+    			yVel=bounceVel;
+    			System.out.println("AFTERBOUNCE"+yVel);
+    		}
+    		else if (propel==true){
     			yVel=propelVel;
     		}
-    		else{
+    		else {
+    			System.out.println("FFF"+yVel);
     			yVel=jumpVel;
     		}
     		//if (clinging==false&&clingPlat==false){
@@ -398,7 +412,7 @@ public class Person {
     		return true;
  		
     	}
-    	//System.out.println("INAIRALREADY");
+    	System.out.println("INAIRALREADY");
     	return false;
     }
     public void some(String tmp){
@@ -410,7 +424,7 @@ public class Person {
     			isClinging=false;
     			clingPlat=false;
     			yVel=jumpVel;
-    		//	System.out.println("yVEL55:"+yVel);
+    			System.out.println("yVEL55:"+yVel);
     		}
     		else{
     			doSome=true;
@@ -446,7 +460,8 @@ public class Person {
     }
     public void gravity(){
     	if (inAir == true){
-    	xVel=Math.abs(xVel)*direction;
+    		//System.out.println("yVEL: "+yVel);
+    		xVel=Math.abs(xVel)*direction;
     		if (yVel>0){
     			if(isClinging==false&&clingPlat==false){	
     				yVel-=0.55;
@@ -576,15 +591,15 @@ public class Person {
     		System.out.println("ENOUGHWALL");
     		if (c3.equals(GREY)==false&&direction==LEFT||c4.equals(GREY)==false&&direction==RIGHT){
     			edgeCling=true;
-    			System.out.println("EDGECLING");
+    			//System.out.println("EDGECLING");
     		}
 	    	if (direction*xVel>=0&&isSinking==false){
-	    		System.out.println("FACING+NOTSINKING");
+	    		//System.out.println("FACING+NOTSINKING");
 	    		if((direction==RIGHT&&checkWallCling(RIGHT)==true)||(direction==LEFT&&checkWallCling(LEFT)==true)||(xVel==0&&(direction==LEFT&&checkWallCling(LEFT)==true)||(direction==RIGHT&&checkWallCling(RIGHT)==true))){
-	    			System.out.println("GOOD");
+	    			//System.out.println("GOOD");
 	    			if (lastWallx!=x+15*direction){
 	    				
-						System.out.println("CLING-NOT WA::");
+						//System.out.println("CLING-NOT WA::");
 						yVel=Math.min(yVel,0);
 					//	yVel=0;
 					//	System.out.println("yVEL3:"+yVel);
@@ -677,7 +692,7 @@ public class Person {
     		if (i==6){
 	    		if (inRange(tmp, plat, "LAND")==true){
 	    			if (i==6||i==7&&direction==LEFT||i==8&&direction==RIGHT){
-	    				System.out.println("PLATEY"+plat.getY());
+	    				//System.out.println("PLATEY"+plat.getY());
 	    				onPlat=true;
 	    				inAir=false;
 	    				landed=true;
@@ -694,6 +709,10 @@ public class Person {
 	    				if ((plat.getType()).equals("DROPPING")==true){
 	    					System.out.println("DROP");
 	    					plat.fallPrepare();
+	    				}
+	    				if ((plat.getType()).equals("BOUNCING")==true){
+	    					System.out.println("BOUNCE");
+	    					plat.bounce();
 	    				}
 	    			}
 	    			
@@ -913,7 +932,8 @@ public class Person {
 			Color c = new Color (map.getRGB(tempX,tempY));
 			Color cM = new Color (movingStuff.getRGB(tempX,tempY));
 			if (c.equals(Color.RED)==true||cM.equals(Color.RED)==true){
-			//	die();		//death by trap (spike)
+				System.out.println("TRAP-DEATH");
+				die();		//death by trap (spike)
 			}
 			else{
     			WallHits[i]=c.equals(GREY);
@@ -957,7 +977,7 @@ public class Person {
 					if (xVel<0&&isSwimming==false&&clingPlat==false){
 						if ((i==1||i==3)&&WallHits[i]==true&&WallHits[6]==false){
 							adjust(x, tempY, -1, 14, "x", map);
-							System.out.println("ADJUSTL");
+							//System.out.println("ADJUSTL");
 							runIntoWall=true;
 							lastPlat=null;
 
@@ -966,7 +986,7 @@ public class Person {
 					if (xVel>0&&isSwimming==false&&clingPlat==false){
 						if ((i==2||i==5)&&WallHits[i]==true&&WallHits[6]==false){
 							adjust(x, tempY, 1, -14, "x", map);
-							System.out.println("ADJUSTR");
+							//System.out.println("ADJUSTR");
 							runIntoWall=true;
 							lastPlat=null;
 						}	
@@ -981,7 +1001,15 @@ public class Person {
 		g2 = movingStuff.createGraphics();
     	g2.setColor(Color.WHITE);
     	g2.fillRect(0,0,level.getWidth(),level.getHeight());
-    	
+    	ArrayList<Traps> tmpT = level.getTraps();
+    	for(int i =0;i<tmpT.size();i++){
+			AffineTransform saveXform = g2.getTransform();
+			AffineTransform at = new AffineTransform();
+			at.rotate(Math.toRadians(tmpT.get(i).getAng()),tmpT.get(i).getX(),tmpT.get(i).getY());
+			g2.transform(at);
+			g2.drawImage(tmpT.get(i).getPic(),tmpT.get(i).getDX(),tmpT.get(i).getDY(),null);
+			g2.setTransform(saveXform);
+    	}
     	ArrayList<Platform> tmpP = level.getPlats();
     	onPlat=false;
     	clingPlat=false;
@@ -1017,7 +1045,14 @@ public class Person {
 	    		y+=yplatVel;
     		}
     	}
-    	
+    	if (onPlat==true&&ridingPlat.getsquishCount()==15){
+    		isBouncing=true;
+    		onPlat=false;
+    		inAir=false;
+    		bounceVel=ridingPlat.getbVel();
+    		jump();
+    		System.out.println("J:          "+yVel);
+    	}
     	wasClingP=false;
     	if (clingPlat==true){
     		wasClingP=true;
@@ -1036,9 +1071,11 @@ public class Person {
     	tooUp=false;
     	tooDown=false;
 		pushedPlat=false;
+		death=false;
+		isBouncing=false;
 		
 		platCheckStuff();
-
+		//System.out.println("APLAT"+yVel);
     	int waterWallhitCount=0;
     	for (int i=0;i<9;i++){
 			waterHits[i]=0;
@@ -1052,6 +1089,7 @@ public class Person {
     				checkCPoint(map,i,j);
     			}
 				if (isSwimming==true){
+					System.out.println("S"+yVel);
 					waterWallhitCount=swimCheckStuff(i, waterWallhitCount, map);
 				}
 					
@@ -1102,6 +1140,7 @@ public class Person {
     	//System.out.println(runIntoWall);
     }
     public void die(){
+    	death=false;
    		deathCount++;
    		int lastCheck=-1;
    		for (int i=0;i<level.getCheckPassed().size();i++){
@@ -1152,10 +1191,9 @@ public class Person {
     public void checkCPoint(BufferedImage map, int i, int j){
     	ArrayList<int[]> checkPoints = level.getCheckPoints();
     	if ((new Color(map.getRGB(x+contactPoints[i][0],y+contactPoints[i][1]))).equals(Color.BLACK)){
-    		if (x+contactPoints[i][0] > checkPoints.get(j)[0] && x+contactPoints[i][0] < checkPoints.get(j)[0]+30 && y+contactPoints[i][1] > checkPoints.get(j)[1] && y+contactPoints[i][1] < checkPoints.get(j)[1]+30){
-    			if (level.getCheckPassed().get(j)!= false){
+    		if (x+contactPoints[i][0] >= checkPoints.get(j)[0] && x+contactPoints[i][0] <= checkPoints.get(j)[0]+30 && y+contactPoints[i][1] >= checkPoints.get(j)[1] && y+contactPoints[i][1] <= checkPoints.get(j)[1]+50){
+    			if (level.getCheckPassed().get(j)== false){
     				level.setCheckPassed(j);
-    				System.out.println("CHECK POINT PASSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSED");
     			}
     		}
     		
