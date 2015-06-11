@@ -21,16 +21,24 @@ import java.util.LinkedList;
 public class Game extends JFrame implements ActionListener {
 	Timer myTimer,clockTimer;
  	GamePanel map;
+ 	ArrayList<Level> loadedLevels= new ArrayList<Level>();
  	public Game() {  //setting up graphic bits
  		super("Game");
 	 	setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
  		setSize(800,600);
- 		map=new GamePanel(this);
+ 		for (int i=0;i<1;i++){
+ 			Level temp= new Level (i+1);
+ 			loadedLevels.add(temp);
+ 		}
+ 		for (int i=0;i<10000000;i++){
+ 		}
+ 		myTimer = new Timer(10,this);
+ 		clockTimer = new Timer (1000,this);
+ 		map=new GamePanel(this,loadedLevels);
  		map.setLocation(0,0);
  		map.setSize(800,600);
  		add(map);
- 		myTimer = new Timer(10,this);
- 		clockTimer = new Timer (1000,this);
+ 		
  		setResizable(false);
  		setVisible(true);
  		
@@ -80,14 +88,14 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 	private Color YELLOW = new Color(255,252,118);
 	private Color ICE = new Color(170,255,236);
 	private Font font;
-	public GamePanel(Game m){
+	public GamePanel(Game m, ArrayList<Level> loadedLevels){
 		mainFrame=m;
 		load();
 		mosX=0;
 		mosY=0;
 		
 		int lev = 1; //chooseLevel();
-		level = new Level(lev);
+		level = loadedLevels.get(0);//new Level(lev);
 		chara=new Person(level);
 		chara.setX(level.getDropx());
 		chara.setY(level.getDropy());
@@ -99,7 +107,7 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 		addMouseListener(this);
 		addMouseMotionListener(this);
 		addKeyListener(this);
-		
+		mainFrame.start();
 	}
 	public void load(){
 		try { //loading the font
@@ -328,18 +336,8 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 		camY=Math.min(level.getHeight(),camY);
 		if (chara.getDeath()==true){
 			System.out.println("DIE");
-			if (camX>chara.getX()){
-				camX=chara.getX()+100;
-			}
-			else{
-				camX=chara.getX()-100;
-			}
-			if (camY>chara.getY()){
-				camY=chara.getY()+100;
-			}
-			else{
-				camY=chara.getY()-100;
-			}
+			camX=chara.getX();
+			camY=chara.getY();
 			camX=Math.max(400,camX);
 			camX=Math.min(level.getWidth(),camX);
 			camY=Math.max(300,camY);
@@ -365,26 +363,41 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 	public void addNotify() {
         super.addNotify();
         requestFocus();
-        mainFrame.start();
+        //mainFrame.start();
     }
     @Override
     public void paintComponent(Graphics g){
     	Graphics2D g2 = (Graphics2D)g;
     	g.drawImage(white,0,0,this);
-    	g.drawImage(level.getMap(),camAdjust("X",0),camAdjust("Y",0),this);
-    	g.drawRect(camAdjust("X",chara.getX()-15),camAdjust("Y",chara.getY())-25,30,45);
+    	
     	ArrayList<Platform> tmpP = level.getPlats();
     	ArrayList<Traps> tmpT = level.getTraps();
+    	ArrayList<Traps> swingSaw = new ArrayList<Traps>();
     	for(int i =0;i< tmpT.size();i++){
-			AffineTransform saveXform = g2.getTransform();
-			AffineTransform at = new AffineTransform();
-			at.rotate(Math.toRadians(tmpT.get(i).getAng()),camAdjust("X",tmpT.get(i).getX()),camAdjust("Y",tmpT.get(i).getY()));
-			g2.transform(at);
-			g2.drawImage(tmpT.get(i).getPic(),camAdjust("X",tmpT.get(i).getDX()),camAdjust("Y",tmpT.get(i).getDY()),this);
-			//stem.out.println(this);
-			g2.setTransform(saveXform);
+    		if (tmpT.get(i).getType()==4){
+    			swingSaw.add(tmpT.get(i));
+    		}
+    		if (tmpT.get(i).getisSpawned()==true&&tmpT.get(i).getType()!=4){
+    		
+	    		if (tmpT.get(i).getAng()==0){
+	    			g.drawImage(tmpT.get(i).getPic(),camAdjust("X",tmpT.get(i).getDX()),camAdjust("Y",tmpT.get(i).getDY()),this);
+	    		}
+	    		else{
+					AffineTransform saveXform = g2.getTransform();
+					AffineTransform at = new AffineTransform();
+					at.rotate(Math.toRadians(tmpT.get(i).getAng()),camAdjust("X",tmpT.get(i).getX()),camAdjust("Y",tmpT.get(i).getY()));
+					g2.transform(at);
+					//System.out.println(at);
+					g2.drawImage(tmpT.get(i).getPic(),camAdjust("X",tmpT.get(i).getDX()),camAdjust("Y",tmpT.get(i).getDY()),this);
+					g2.setTransform(saveXform);
+	    		}
+    		}
     	}
+    	g.drawImage(level.getMap(),camAdjust("X",0),camAdjust("Y",0),this);
+    	g.drawRect(camAdjust("X",chara.getX()-15),camAdjust("Y",chara.getY())-25,30,45);
+    	
     	for(int i =0;i< tmpP.size();i++){
+    		
     		
     	 //DRAW PLATFORMS
     	//	System.out.println("TYPE:"+tmpP.get(i).getType());
@@ -406,6 +419,15 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
     		}
     		g.fillRect(camAdjust("X",tmpP.get(i).getX()),camAdjust("Y",tmpP.get(i).getY()),tmpP.get(i).getWidth(),tmpP.get(i).getHeight());
     	}
+    	for(int i =0;i< swingSaw.size();i++){
+    		AffineTransform saveXform = g2.getTransform();
+			AffineTransform at = new AffineTransform();
+			at.rotate(Math.toRadians(swingSaw.get(i).getAng()),camAdjust("X",swingSaw.get(i).getX()),camAdjust("Y",swingSaw.get(i).getY()));
+			g2.transform(at);	
+			g2.drawImage(swingSaw.get(i).getPic(),camAdjust("X",swingSaw.get(i).getDX()),camAdjust("Y",swingSaw.get(i).getDY()),this);
+			g2.setTransform(saveXform);
+    	}
+    		
     	ArrayList<Image> checkPics = level.getCheckPics();
 		ArrayList<int[]> checkPoints = level.getCheckPoints();
 		for (int i=0;i < checkPics.size();i++){

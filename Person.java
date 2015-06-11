@@ -28,7 +28,7 @@ public class Person {
 	private String [] picNames = new String []{"Walk", "Jump", "Some", "Slid", "Swim", "Dead"};
 	private int [] frameTotal = new int []{0,0,0,0,0,0};
 	private Image temp= new ImageIcon("profile.png").getImage();
-	private double xVel,yVel,sVel,slideCoefficient,clingCoefficient;
+	private double xVel,yVel,sVel,slideCoefficient,clingCoefficient,iceCoefficient;
 	private int headAngle;
 	private int direction;
 	private int swimDir=1;
@@ -111,6 +111,7 @@ public class Person {
     	levelSizeX= level.getWidth();
     	levelSizeY= level.getHeight();
     	slideCoefficient=0.5;
+    	iceCoefficient=0.1;
     	clingCoefficient=0.05;
     	checkPointX = level.getDropx();
     	checkPointY = level.getDropy();
@@ -372,14 +373,19 @@ public class Person {
     			}
     	}
     	else if (isWalking==false&&Math.abs(xVel)>0){
-				double tmp=xVel+direction*-1*slideCoefficient;
-	    		if (tmp*xVel<0){
-	    			xVel=0;
-	    		}
-	    		else{
-	    			xVel=tmp;
-	    		}
-			
+    		double tmp;
+    		if(onIce == false){
+				tmp=xVel+direction*-1*slideCoefficient;
+    		}
+    		else{
+    			tmp=xVel+direction*-1*iceCoefficient;
+    		}
+			if (tmp*xVel<0){
+	    		xVel=0;
+	    	}
+	    	else{
+	    		xVel=tmp;
+	    	}
     		
     		
     	}	
@@ -557,8 +563,8 @@ public class Person {
     		}
     		if (temp=="DOWN"){
     			if (canSwim(ang, -1, map)==true){
-	    			x=x-(int)(1*Math.cos(ang));
-	    			y=y+(int)(1*Math.sin(ang));
+	    			x=x-(int)(2*Math.cos(ang));
+	    			y=y+(int)(2*Math.sin(ang));
 	    			System.out.println("DOWN");
     			}
     			swimDir=-1; 
@@ -844,6 +850,7 @@ public class Person {
 		hitGround=true;
 		airCount=0;
 		apex=y;
+		xVel=Math.abs(xVel)*direction;
 		lastWallx=x;
 		isClinging=false;
 		clingPlat=false;
@@ -991,7 +998,7 @@ public class Person {
     					adjust(tempX,  y, 1, -22, "y", map);
     				}
 					if (xVel<0&&isSwimming==false&&clingPlat==false){
-						if ((i==1||i==3)&&WallHits[i]==true&&WallHits[6]==false){
+						if ((i==1||i==3||i==7)&&WallHits[i]==true&&WallHits[6]==false){
 							adjust(x, tempY, -1, 14, "x", map);
 							//System.out.println("ADJUSTL");
 							runIntoWall=true;
@@ -1000,7 +1007,7 @@ public class Person {
 						}
 					}
 					if (xVel>0&&isSwimming==false&&clingPlat==false){
-						if ((i==2||i==5)&&WallHits[i]==true&&WallHits[6]==false){
+						if ((i==2||i==5||i==8)&&WallHits[i]==true&&WallHits[6]==false){
 							adjust(x, tempY, 1, -14, "x", map);
 							//System.out.println("ADJUSTR");
 							runIntoWall=true;
@@ -1019,12 +1026,19 @@ public class Person {
     	g2.fillRect(0,0,level.getWidth(),level.getHeight());
     	ArrayList<Traps> tmpT = level.getTraps();
     	for(int i =0;i<tmpT.size();i++){
-			AffineTransform saveXform = g2.getTransform();
-			AffineTransform at = new AffineTransform();
-			at.rotate(Math.toRadians(tmpT.get(i).getAng()),tmpT.get(i).getX(),tmpT.get(i).getY());
-			g2.transform(at);
-			g2.drawImage(tmpT.get(i).getPic(),tmpT.get(i).getDX(),tmpT.get(i).getDY(),null);
-			g2.setTransform(saveXform);
+    		if (tmpT.get(i).getisSpawned()==true){
+	    		if (tmpT.get(i).getAng()==0){
+	    			g2.drawImage(tmpT.get(i).getPic(),tmpT.get(i).getDX(),tmpT.get(i).getDY(),null);
+	    		}
+	    		else{
+					AffineTransform saveXform = g2.getTransform();
+					AffineTransform at = new AffineTransform();
+					at.rotate(Math.toRadians(tmpT.get(i).getAng()),tmpT.get(i).getX(),tmpT.get(i).getY());
+					g2.transform(at);
+					g2.drawImage(tmpT.get(i).getPic(),tmpT.get(i).getDX(),tmpT.get(i).getDY(),null);
+					g2.setTransform(saveXform);
+	    		}
+    		}
     	}
     	ArrayList<Platform> tmpP = level.getPlats();
     	onPlat=false;

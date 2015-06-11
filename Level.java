@@ -40,6 +40,7 @@ public class Level {
     	try{
     		infile=new Scanner(new File("Maps/"+levelNum+".txt"));
     		trapfile=new Scanner(new File("Images/Interactives/"+levelNum+".txt"));
+    		System.out.println(trapfile);
     			
     	}
     	catch(IOException ex){
@@ -49,13 +50,14 @@ public class Level {
     	//load checkpoints
     	loadCP();
     	//load traps
-    	loadTrap();							//	<=============to be completed
+    	loadTrap();	
+    	System.out.println("DONE");//	<=============to be completed
     }
     public void loadTrap(){
     	int num=Integer.parseInt(trapfile.nextLine());
     	for (int i = 0; i<num;i++){
     		String line = trapfile.nextLine();
-			Traps tmp=new Traps(line);
+			Traps tmp=new Traps(line,this);
 			traps.add(tmp);
     	}
     }
