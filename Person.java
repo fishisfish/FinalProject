@@ -28,7 +28,7 @@ public class Person {
 	private String [] picNames = new String []{"Walk", "Jump", "Some", "Slid", "Swim", "Dead"};
 	private int [] frameTotal = new int []{0,0,0,0,0,0};
 	private Image temp= new ImageIcon("profile.png").getImage();
-	private double xVel,yVel,sVel,slideCoefficient,clingCoefficient;
+	private double xVel,yVel,sVel,slideCoefficient,clingCoefficient,iceCoefficient;
 	private int headAngle;
 	private int direction;
 	private int swimDir=1;
@@ -70,6 +70,7 @@ public class Person {
     private boolean edgeCling=false;
     private boolean pushedPlat=false;
     private boolean death=false;
+    private boolean onIce=false;
     private boolean[] WallHits = new boolean[9];
     private boolean[] MovingStuffHits = new boolean[9];
     private boolean [] wallHitinWater = new boolean [9];
@@ -110,6 +111,7 @@ public class Person {
     	levelSizeX= level.getWidth();
     	levelSizeY= level.getHeight();
     	slideCoefficient=0.5;
+    	iceCoefficient=0.1;
     	clingCoefficient=0.05;
     	checkPointX = level.getDropx();
     	checkPointY = level.getDropy();
@@ -350,7 +352,7 @@ public class Person {
     	if (inAir==true&&yVel<0){
     		fallCount+=1;
     		if (fallCount>100){
-    			System.out.println("FDEATH");
+    			System.out.println("death by falling");
     			die();	//death by falling
     		}
     	}
@@ -371,14 +373,19 @@ public class Person {
     			}
     	}
     	else if (isWalking==false&&Math.abs(xVel)>0){
-				double tmp=xVel+direction*-1*slideCoefficient;
-	    		if (tmp*xVel<0){
-	    			xVel=0;
-	    		}
-	    		else{
-	    			xVel=tmp;
-	    		}
-			
+    		double tmp;
+    		if(onIce == false){
+				tmp=xVel+direction*-1*slideCoefficient;
+    		}
+    		else{
+    			tmp=xVel+direction*-1*iceCoefficient;
+    		}
+			if (tmp*xVel<0){
+	    		xVel=0;
+	    	}
+	    	else{
+	    		xVel=tmp;
+	    	}
     		
     		
     	}	
@@ -434,7 +441,13 @@ public class Person {
     
     public void slide(){
     	System.out.println("SLIDE");
-    	double tmp=xVel+direction*0.2*-1;
+    	double tmp=0;
+    	if (onIce == false){
+    		tmp=xVel+direction*0.2*-1;
+    	}
+    	else{
+    		tmp=xVel+direction*0.1*-1;
+    	}
     	if (tmp*xVel<=0||direction*xVel<=0){
     		xVel=0;
     	}
@@ -714,6 +727,13 @@ public class Person {
 	    					System.out.println("BOUNCE");
 	    					plat.bounce();
 	    				}
+	    				if((plat.getType()).equals("ICE")==true){
+	    					//System.out.println("ICE");
+	    					onIce = true;
+	    				}
+	    				else{
+	    					onIce = false;
+	    				}
 	    			}
 	    			
 	    		}
@@ -870,6 +890,7 @@ public class Person {
 	public int swimCheckStuff(int i, int waterWallhitCount, BufferedImage map){
 		Color cS = new Color (map.getRGB(x+rotatedPoints[i][0],y+rotatedPoints[i][1]));
 		if (cS.equals(Color.RED)==true){
+			//System.out.println("death by trap");
 			//die();		//death by trap
 			return 0;
 		}
@@ -970,6 +991,7 @@ public class Person {
     				if (i==6&&inAir==true){
     					System.out.println("HITGROUND");
     					if (fallCount>=70){
+    						System.out.println("death by falling2");
     						die();	//death by falling
     					}
     					adjust(tempX,  y, 1, -22, "y", map);
@@ -1111,6 +1133,7 @@ public class Person {
     		}
     		
     		else{
+    			System.out.println("death by being out of bounds (in water)");
     			die();	//death by being out of bounds (in water)
     		}
     	}
@@ -1122,6 +1145,7 @@ public class Person {
 
     	
     	if ((WallHits[0]==true||MovingStuffHits[0]==true)&&(WallHits[6]==true||MovingStuffHits[6]==true)){//amy waz here
+    		System.out.println("death by squishing");
     		die();	//death by squishing between two platforms (vertical)
     	}
     	if (WallHits[1]==false&&WallHits[2]==false&&WallHits[3]==false&&WallHits[5]==false&&WallHits[7]==false&&WallHits[8]==false&&clingPlat==false){
@@ -1196,6 +1220,7 @@ public class Person {
     	walkCount=0;
     	picStall=0;
     	fallCount=0;
+    	level.iceRegen();
     }
     public void checkCPoint(BufferedImage map, int i, int j){
     	ArrayList<int[]> checkPoints = level.getCheckPoints();
@@ -1206,16 +1231,7 @@ public class Person {
     			}
     		}
     		
-    		
     	}
     }
-    /*public boolean checkHor(){
-    //checks collision in the horizontal
-     	
-     }
-    public boolean offGround(){
-    //checks collision in the vertical
-    	
-    }*/
 
 }

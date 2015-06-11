@@ -16,11 +16,13 @@ import java.util.LinkedList;
 
 public class Platform{
 	private int x,y,ox,oy,dx,dy,width,height,dir,vel;
+	private double oheight,iheight; //special height keepers for ice platforms
 	private String [] data;
 	private String type;
 	private boolean falling=false;
 	private boolean willFall=false;
 	private boolean isBouncing=false;
+	private boolean isMelting=false;
 	private int fallCount=0;
 	private int countDown=0;
 	private int squishCount=0;
@@ -33,11 +35,16 @@ public class Platform{
 		oy = y;
 		width = Integer.parseInt(data[2]);
 		height = Integer.parseInt(data[3]);
+		oheight = height;
 		dx = Integer.parseInt(data[4]);
 		dy = Integer.parseInt(data[5]);
 		dir = Integer.parseInt(data[6]);
 		vel = Integer.parseInt(data[7]);
 		type=data[8];
+		System.out.println(type);
+		if(type.equals("ICE")){
+			iheight = height;
+		}
 		bounceVel= Integer.parseInt(data[9]);
 		//System.out.println(data[8]);
 	}
@@ -58,7 +65,7 @@ public class Platform{
 		else{
 			return 0;
 		}
-		}
+	}
 	public String getType(){
 		//System.out.println(type);
 		return type;
@@ -73,6 +80,12 @@ public class Platform{
 	public void bounce(){
 		isBouncing=true;
 	}
+	public void melt(){
+		isMelting=true;
+	}
+	public boolean getMelt(){
+		return isMelting;
+	}
 	public int getbVel(){
 		return bounceVel;
 	}
@@ -80,7 +93,11 @@ public class Platform{
 		return squishCount;
 	}
 	public int getWidth(){return width;}
-	public int getHeight(){return height;}
+	public int getHeight(){
+		if(type.equals("ICE")){
+			return (int)(iheight);
+		}
+		return height;}
 	
 	public void move(){
 		if (dx!=0){
@@ -141,11 +158,18 @@ public class Platform{
 				isBouncing=false;
 			}
 			squishCount+=1;
-		}	
+		}
+		if(isMelting==true){
+			iheight -= 0.01;
+			iheight = Math.max(0,iheight);
+		}
+	}
+	public void regen(){
+		isMelting = false;
+		iheight = oheight;
 	}
 	public String toString(){
 		return "{"+data[0]+","+data[1]+"}";
 	}
-	
 	
 }

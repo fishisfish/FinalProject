@@ -40,6 +40,7 @@ public class Level {
     	try{
     		infile=new Scanner(new File("Maps/"+levelNum+".txt"));
     		trapfile=new Scanner(new File("Images/Interactives/"+levelNum+".txt"));
+    		System.out.println(trapfile);
     			
     	}
     	catch(IOException ex){
@@ -123,6 +124,44 @@ public class Level {
     public void moveTraps(){
     	for (int i=0;i<traps.size();i++){
     		traps.get(i).move();
+    	}
+    }
+    public void meltIce(int camX, int camY){
+    	for (int i=0;i<movingPlats.size();i++){
+    		if((movingPlats.get(i).getType()).equals("ICE")){
+    			if(checkInSight(camX,camY,i)==true&&movingPlats.get(i).getMelt()!=true){
+    				movingPlats.get(i).melt();
+    				//System.out.println("melttttttttt");
+    			}
+    		}
+    	}
+    }
+    public void iceRegen(){
+    	for (int i=0;i<movingPlats.size();i++){
+    		if((movingPlats.get(i).getType()).equals("ICE")){
+    			movingPlats.get(i).regen();
+    		}
+    	}
+    }
+    public boolean checkInSight(int camX, int camY, int platNum){
+    	int iceX = movingPlats.get(platNum).getX();
+    	int iceY = movingPlats.get(platNum).getY();
+    	boolean hor = false;
+    	boolean ver = false;
+    	if(Math.abs(camX-iceX) <= 400){
+    		hor = true;
+    	}
+    	if(Math.abs(camY-iceY) <= 300){
+    		ver = true;
+    	}
+    	//System.out.println("HORIZONTAL: " +Math.abs(camX-iceX)+", "+hor);
+    	//System.out.println("VERTICAL: "+Math.abs(camY-iceY)+", "+ver);
+    	if (hor ==true && ver ==true /*|| (Math.abs(camX-(iceX+movingPlats.get(platNum).getWidth()))<=400 && Math.abs(camX-(iceY+movingPlats.get(platNum).getHeight()))<=300)*/){
+    		System.out.println("PEEEEEKABOO");
+    		return true;
+    	}
+    	else{
+    		return false;
     	}
     }
 }

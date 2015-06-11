@@ -86,6 +86,7 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 	private Color ORANGE = new Color (255,153,0);
 	private Color INDIGO = new Color (138,0,255);
 	private Color YELLOW = new Color(255,252,118);
+	private Color ICE = new Color(170,255,236);
 	private Font font;
 	public GamePanel(Game m, ArrayList<Level> loadedLevels){
 		mainFrame=m;
@@ -100,7 +101,7 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 		chara.setY(level.getDropy());
 		camX=level.getDropx();
 		camY=level.getDropy()-300;
-		white = new ImageIcon("white.png").getImage();
+		white = new ImageIcon("white2.png").getImage();
 	//	System.out.println("dd");
 		keys = new boolean[65535];
 		addMouseListener(this);
@@ -346,6 +347,7 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 	public void moveLevel(){
 		level.movePlatforms();
 		level.moveTraps();
+		level.meltIce(camX,camY);
 	}
 	public int camAdjust(String temp,int ori){
 		if (temp=="X"){
@@ -405,11 +407,15 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
     			g.setColor(ORANGE);
     		}
     		if ((tmpP.get(i).getType()).equals("DROPPING")==true){
-    		//	System.out.println("INDIGO");
+    			//System.out.println("INDIGO");
     			g.setColor(INDIGO);
     		}
     		if ((tmpP.get(i).getType()).equals("BOUNCING")==true){
     			g.setColor(YELLOW);
+    		}
+    		if ((tmpP.get(i).getType()).equals("ICE")==true){
+    			g.setColor(ICE);
+    			//System.out.println("ICE");
     		}
     		g.fillRect(camAdjust("X",tmpP.get(i).getX()),camAdjust("Y",tmpP.get(i).getY()),tmpP.get(i).getWidth(),tmpP.get(i).getHeight());
     	}
@@ -440,7 +446,6 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
     		}
     	}
     	else{
-    	
 			AffineTransform saveXform = g2.getTransform();
 			AffineTransform at = new AffineTransform();
 			at.rotate(Math.toRadians((90-chara.getAn())%360),camAdjust("X",chara.getX()),camAdjust("Y",chara.getY()));
