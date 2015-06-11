@@ -1,0 +1,11 @@
+# of traps
+x,y,dx,dy,velx,vely,dirx,diry,angVel,newWidth,newHeight,spawnCount,resize,TYPE
+
+types:
+SPIKES = 0;
+CIRC_SAW = 1;
+NINJA_STAR_ST = 2;
+LASER = 3;
+SWING_SAW =4;
+ROT_STAR = 5;
+NINJA_STAR_BO = 6;

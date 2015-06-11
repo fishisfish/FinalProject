@@ -889,9 +889,10 @@ public class Person {
 	}
 	public int swimCheckStuff(int i, int waterWallhitCount, BufferedImage map){
 		Color cS = new Color (map.getRGB(x+rotatedPoints[i][0],y+rotatedPoints[i][1]));
-		if (cS.equals(Color.RED)==true){
+		Color cSm = new Color (movingStuff.getRGB(x+rotatedPoints[i][0],y+rotatedPoints[i][1]));
+		if (cS.equals(Color.RED)==true||cSm.equals(Color.RED)==true){
 			//System.out.println("death by trap");
-			//die();		//death by trap
+			die();		//death by trap
 			return 0;
 		}
 		else{
@@ -955,7 +956,7 @@ public class Person {
 			Color cM = new Color (movingStuff.getRGB(tempX,tempY));
 			if (c.equals(Color.RED)==true||cM.equals(Color.RED)==true){
 				System.out.println("TRAP-DEATH");
-				//die();		//death by trap (spike)
+				die();		//death by trap (spike)
 			}
 			else{
     			WallHits[i]=c.equals(GREY);
@@ -1094,6 +1095,7 @@ public class Person {
     	hitHead = false;
     	hitGround=false;
     	leavingWater=false;
+    	onIce=false;
     	canRight=true;
     	canLeft=true;
     	tooRight=false;
