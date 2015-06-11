@@ -550,8 +550,8 @@ public class Person {
     		}
     		if (temp=="DOWN"){
     			if (canSwim(ang, -1, map)==true){
-	    			x=x-(int)(1*Math.cos(ang));
-	    			y=y+(int)(1*Math.sin(ang));
+	    			x=x-(int)(2*Math.cos(ang));
+	    			y=y+(int)(2*Math.sin(ang));
 	    			System.out.println("DOWN");
     			}
     			swimDir=-1; 
@@ -830,6 +830,7 @@ public class Person {
 		hitGround=true;
 		airCount=0;
 		apex=y;
+		xVel=Math.abs(xVel)*direction;
 		lastWallx=x;
 		isClinging=false;
 		clingPlat=false;
@@ -933,7 +934,7 @@ public class Person {
 			Color cM = new Color (movingStuff.getRGB(tempX,tempY));
 			if (c.equals(Color.RED)==true||cM.equals(Color.RED)==true){
 				System.out.println("TRAP-DEATH");
-				die();		//death by trap (spike)
+				//die();		//death by trap (spike)
 			}
 			else{
     			WallHits[i]=c.equals(GREY);
@@ -975,7 +976,7 @@ public class Person {
     					adjust(tempX,  y, 1, -22, "y", map);
     				}
 					if (xVel<0&&isSwimming==false&&clingPlat==false){
-						if ((i==1||i==3)&&WallHits[i]==true&&WallHits[6]==false){
+						if ((i==1||i==3||i==7)&&WallHits[i]==true&&WallHits[6]==false){
 							adjust(x, tempY, -1, 14, "x", map);
 							//System.out.println("ADJUSTL");
 							runIntoWall=true;
@@ -984,7 +985,7 @@ public class Person {
 						}
 					}
 					if (xVel>0&&isSwimming==false&&clingPlat==false){
-						if ((i==2||i==5)&&WallHits[i]==true&&WallHits[6]==false){
+						if ((i==2||i==5||i==8)&&WallHits[i]==true&&WallHits[6]==false){
 							adjust(x, tempY, 1, -14, "x", map);
 							//System.out.println("ADJUSTR");
 							runIntoWall=true;

@@ -5,14 +5,18 @@
  * @Iris Chang
  * @version 1.00 2015/5/5
  */
+import java.awt.*;
+import java.awt.event.*;
+import java.awt.Image;
+import java.awt.geom.*;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
+import javax.swing.*;
+import javax.swing.JPanel.*;
 import java.util.ArrayList;
 import java.io.*;
 import java.util.Scanner;
-import java.awt.Image;
-import javax.swing.*;
-import javax.swing.JPanel.*;
+import java.util.LinkedList;
 
 public class Traps {
 	private int type;
@@ -25,20 +29,28 @@ public class Traps {
 	public static final int NINJA_STAR_BO = 6;
 	private boolean stationary;
 	private int scale;
-	private int newWidth;
-	private int newHeight;
+	private int newWidth,oWidth;
+	private int newHeight,oHeight;
 	private int x,y,ox,oy;
 	private int dx,dy;
-	private int vel;
-	private int dir;
+	private int velx,vely;
+	private int dirx,diry,odirx,odiry;
 	private int angVel;
 	private int ang=0;
-	private int spawnCount;
+	private int spawnCount, resize;
+	private ArrayList<Image> resizedPics = new ArrayList<Image>();
 	private Image pic;
 	private Image resizedPic;
 	private boolean isSpawned=true;
-    public Traps(String line) {
-    	//x, y, dx, dy, speed, angVel, newWidth, newHeight, TYPE, dir, spawnCount
+	private int growth=1;
+	private int growing=0;
+	private Level level;
+	private BufferedImage map;
+	private Color GREY = new Color(130,130,130);
+    public Traps(String line, Level lev) {
+    	level=lev;
+    	map=level.getMap();
+    	//x, y, dx, dy, velx, vely, dirx, diry, angVel, newWidth, newHeight,spawnCount, resize, TYPE
     	String [] data = line.split(",");
     	x=Integer.parseInt(data[0]);
     	y=Integer.parseInt(data[1]);
@@ -46,13 +58,21 @@ public class Traps {
 		oy = y;
     	dx=Integer.parseInt(data[2]);
     	dy=Integer.parseInt(data[3]);
-    	vel=Integer.parseInt(data[4]);
-    	angVel=Integer.parseInt(data[5]);
-    	newWidth=Integer.parseInt(data[6]);
-    	newHeight=Integer.parseInt(data[7]);
-    	type=Integer.parseInt(data[8]);
-    	dir=Integer.parseInt(data[9]);
-    	spawnCount=Integer.parseInt(data[10]);
+    	velx=Integer.parseInt(data[4]);
+    	vely=Integer.parseInt(data[5]);
+    	dirx=Integer.parseInt(data[6]);
+    	diry=Integer.parseInt(data[7]);
+    	odirx=dirx;
+    	odiry=diry;
+    	angVel=Integer.parseInt(data[8]);
+    	newWidth=Integer.parseInt(data[9]);
+    	newHeight=Integer.parseInt(data[10]);
+    	oWidth=newWidth;
+    	oHeight=newHeight;
+    	spawnCount=Integer.parseInt(data[11]);
+    	resize=Integer.parseInt(data[12]);
+    	type=Integer.parseInt(data[13]);
+    	System.out.println("width "+newWidth);
     	
     	if (type==2||type==6){
     		isSpawned=false;
@@ -60,10 +80,19 @@ public class Traps {
     	System.out.println("Images/Interactives/"+type+".png");
     	pic =new ImageIcon("Images/Interactives/"+type+".png").getImage();
     	resizedPic=pic.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
-    	
+    	if (resize!=0){
+    		for (int i=0;i<resize+1;i++){
+    			Image temp=pic.getScaledInstance(newWidth+i, newHeight+i, Image.SCALE_DEFAULT);
+    			resizedPics.add(temp);
+    		}
+    		
+    	}
     }
-    
+    public int getType(){
+    	return type;
+    }
     public void move(){
+    	
     	if (isSpawned==false){
     		spawnCount-=1;
     		if (spawnCount==0){
@@ -73,36 +102,67 @@ public class Traps {
     	ang=(ang+angVel)%360;
     	if (type==2){
     		if (isSpawned==true){
-	    		x += vel*dir;
-				if ((x-ox)*dir==dx){
+	    		x += velx*dirx;
+				if ((x-ox)*dirx==dx){
+					
 					x=ox;
 					isSpawned=false;
 					spawnCount=30;
 				}
     		}
     	}
+    	else if (type==6){
+    		if (isSpawned==true){
+    			if (dx==0){
+    				x=ox;
+					isSpawned=false;
+					spawnCount=30;
+					y=ox;
+					dx=dy;
+					dirx=odirx;
+    				diry=odiry;
+    			}
+    			//System.out.println("SPAWM");
+	    		Color c = new Color (map.getRGB(x,y));
+	    		if (c.equals(GREY)==true){
+	    			Color c1 = new Color (map.getRGB(x+1,y));
+	    			Color c2 = new Color (map.getRGB(x-1,y));
+	    			Color c3 = new Color (map.getRGB(x,y+1));
+	    			Color c4 = new Color (map.getRGB(x,y-1));
+	    			
+	    			if (c1.equals(GREY)==false||c2.equals(GREY)==false){
+	    				dirx*=-1;
+	    			}
+	    			else if (c3.equals(GREY)==false||c4.equals(GREY)==false){
+	    				diry*=-1;
+	    			}
+	    		}
+	    		x += velx*dirx;
+	    		y += vely*diry;
+	    		dx-=1;
+    		}
+    	}
     	else{
 	    	if (dx!=0){
-				if ((x-ox)*dir<dx){
-					x += vel*dir;
-					String velo = vel+"";
+				if ((x-ox)*dirx<dx){
+					x += velx*dirx;
+					
 					//System.out.println("VELOCITY: " + velo + "\nDIRECTION")
 				}
 				else{
-					dir*=-1;
-					x += vel*dir;
+					dirx*=-1;
+					x += velx*dirx;
 				}
 			}
 			else if (dy!=0){
-				if ((y-oy)*dir<dy){
-					y += vel*dir;
-					String velo = vel+"";
+				if ((y-oy)*diry<dy){
+					y += vely*diry;
 					//System.out.println("VELOCITY: " + velo + "\nDIRECTION")
 				}
 				else{
 				//	System.out.println("BLLOP");
-					dir*=-1;
-					y += vel*dir;
+					diry*=-1;
+					y += vely*diry;
 				}
 			}
     	}
@@ -122,13 +182,32 @@ public class Traps {
     	return y;
     }
     public int getDX(){
+    	if (resize!=0){
+    		//return (int)(x-newWidth/2);
+    	}
     	return (int)(x-newWidth/2);
     }
     public int getDY(){
     	return (int)(y-newHeight/2);
     }
     public Image getPic(){
-    	//System.out.println("GOTPIC");
+    	if (resize!=0){
+    		Image tmp = resizedPics.get(growing);
+    		newWidth=tmp.getWidth(null);
+    		newHeight=newWidth;
+    		growing+=growth;
+    		System.out.println(growing);
+    		if (growing==resize-1){
+    			growth=-1;
+    			
+    		}
+    		if (growing==0){
+    			growth=1;
+    			//System.out.println("GROW");
+    		}
+    		return tmp;
+    	}
+    	System.out.println("DER");
     	return resizedPic;
     	
     }
