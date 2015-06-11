@@ -370,7 +370,11 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
     	
     	ArrayList<Platform> tmpP = level.getPlats();
     	ArrayList<Traps> tmpT = level.getTraps();
+    	ArrayList<Traps> swingSaw = new ArrayList<Traps>();
     	for(int i =0;i< tmpT.size();i++){
+    		if (tmpT.get(i).getType()==4){
+    			swingSaw.add(tmpT.get(i));
+    		}
     		if (tmpT.get(i).getisSpawned()==true&&tmpT.get(i).getType()!=4){
     		
 	    		if (tmpT.get(i).getAng()==0){
@@ -389,7 +393,9 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
     	}
     	g.drawImage(level.getMap(),camAdjust("X",0),camAdjust("Y",0),this);
     	g.drawRect(camAdjust("X",chara.getX()-15),camAdjust("Y",chara.getY())-25,30,45);
+    	
     	for(int i =0;i< tmpP.size();i++){
+    		
     		
     	 //DRAW PLATFORMS
     	//	System.out.println("TYPE:"+tmpP.get(i).getType());
@@ -407,6 +413,15 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
     		}
     		g.fillRect(camAdjust("X",tmpP.get(i).getX()),camAdjust("Y",tmpP.get(i).getY()),tmpP.get(i).getWidth(),tmpP.get(i).getHeight());
     	}
+    	for(int i =0;i< swingSaw.size();i++){
+    		AffineTransform saveXform = g2.getTransform();
+			AffineTransform at = new AffineTransform();
+			at.rotate(Math.toRadians(swingSaw.get(i).getAng()),camAdjust("X",swingSaw.get(i).getX()),camAdjust("Y",swingSaw.get(i).getY()));
+			g2.transform(at);	
+			g2.drawImage(swingSaw.get(i).getPic(),camAdjust("X",swingSaw.get(i).getDX()),camAdjust("Y",swingSaw.get(i).getDY()),this);
+			g2.setTransform(saveXform);
+    	}
+    		
     	ArrayList<Image> checkPics = level.getCheckPics();
 		ArrayList<int[]> checkPoints = level.getCheckPoints();
 		for (int i=0;i < checkPics.size();i++){
