@@ -398,7 +398,7 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 			//}
 			
     	}
-    	
+
     	g.setFont(font); 
 		g.setColor(Color.BLACK);
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON); //makes the font pretty when its drawn

@@ -341,9 +341,9 @@ public class Person {
     	}
     	if (inAir==true&&yVel<0){
     		fallCount+=1;
-    		if (fallCount>500){
-    			//System.out.println("FDEATH");
-    			//die();
+    		if (fallCount>100){
+    			System.out.println("FDEATH");
+    			die();	//death by falling
     		}
     	}
     	if (inAir==false && runIntoWall == false && (int)(x+xVel) >=0 && (int)(x+xVel) <= levelSizeX){
@@ -850,7 +850,7 @@ public class Person {
 	public int swimCheckStuff(int i, int waterWallhitCount, BufferedImage map){
 		Color cS = new Color (map.getRGB(x+rotatedPoints[i][0],y+rotatedPoints[i][1]));
 		if (cS.equals(Color.RED)==true){
-			//die();
+			//die();		//death by trap
 			return 0;
 		}
 		else{
@@ -913,7 +913,7 @@ public class Person {
 			Color c = new Color (map.getRGB(tempX,tempY));
 			Color cM = new Color (movingStuff.getRGB(tempX,tempY));
 			if (c.equals(Color.RED)==true||cM.equals(Color.RED)==true){
-			//	die();
+			//	die();		//death by trap (spike)
 			}
 			else{
     			WallHits[i]=c.equals(GREY);
@@ -948,8 +948,8 @@ public class Person {
     				}
     				if (i==6&&inAir==true){
     					System.out.println("HITGROUND");
-    					if (fallCount>=500){
-    						die();
+    					if (fallCount>=70){
+    						die();	//death by falling
     					}
     					hitGroundreset();
     					adjust(tempX,  y, 1, -22, "y", map);
@@ -1047,10 +1047,10 @@ public class Person {
 
     	for (int i=0;i<9;i++){
     		int tempX,tempY;
-    		for (int j=0;j<level.getCheckPoints().size();j++){
-    			checkCPoint(map,i,j);
-    		}
     		if(x+rotatedPoints[i][0] <= levelSizeX && x+rotatedPoints[i][0] >=0 && y+rotatedPoints[i][1] <= levelSizeY && y+rotatedPoints[i][1] >=0){
+				for (int j=0;j<level.getCheckPoints().size();j++){
+    				checkCPoint(map,i,j);
+    			}
 				if (isSwimming==true){
 					waterWallhitCount=swimCheckStuff(i, waterWallhitCount, map);
 				}
@@ -1064,7 +1064,7 @@ public class Person {
     		}
     		
     		else{
-    			//die();
+    			die();	//death by being out of bounds (in water)
     		}
     	}
     	if (clingPlat==true){
@@ -1075,7 +1075,7 @@ public class Person {
 
     	
     	if ((WallHits[0]==true||MovingStuffHits[0]==true)&&(WallHits[6]==true||MovingStuffHits[6]==true)){//amy waz here
-    		die();
+    		die();	//death by squishing between two platforms (vertical)
     	}
     	if (WallHits[1]==false&&WallHits[2]==false&&WallHits[3]==false&&WallHits[5]==false&&WallHits[7]==false&&WallHits[8]==false&&clingPlat==false){
     		//System.out.println("NOT-CLINGG");
@@ -1153,11 +1153,10 @@ public class Person {
     	ArrayList<int[]> checkPoints = level.getCheckPoints();
     	if ((new Color(map.getRGB(x+contactPoints[i][0],y+contactPoints[i][1]))).equals(Color.BLACK)){
     		if (x+contactPoints[i][0] > checkPoints.get(j)[0] && x+contactPoints[i][0] < checkPoints.get(j)[0]+30 && y+contactPoints[i][1] > checkPoints.get(j)[1] && y+contactPoints[i][1] < checkPoints.get(j)[1]+30){
-    			/*if (level.getCheckPassed().get(j)!= false){
-    				
-    			}*/
-    			level.setCheckPassed(j);
-    			System.out.println("CHECK POINT PASSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSED");
+    			if (level.getCheckPassed().get(j)!= false){
+    				level.setCheckPassed(j);
+    				System.out.println("CHECK POINT PASSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSED");
+    			}
     		}
     		
     		
