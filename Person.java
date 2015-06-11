@@ -1003,12 +1003,19 @@ public class Person {
     	g2.fillRect(0,0,level.getWidth(),level.getHeight());
     	ArrayList<Traps> tmpT = level.getTraps();
     	for(int i =0;i<tmpT.size();i++){
-			AffineTransform saveXform = g2.getTransform();
-			AffineTransform at = new AffineTransform();
-			at.rotate(Math.toRadians(tmpT.get(i).getAng()),tmpT.get(i).getX(),tmpT.get(i).getY());
-			g2.transform(at);
-			g2.drawImage(tmpT.get(i).getPic(),tmpT.get(i).getDX(),tmpT.get(i).getDY(),null);
-			g2.setTransform(saveXform);
+    		if (tmpT.get(i).getisSpawned()==true){
+	    		if (tmpT.get(i).getAng()==0){
+	    			g2.drawImage(tmpT.get(i).getPic(),tmpT.get(i).getDX(),tmpT.get(i).getDY(),null);
+	    		}
+	    		else{
+					AffineTransform saveXform = g2.getTransform();
+					AffineTransform at = new AffineTransform();
+					at.rotate(Math.toRadians(tmpT.get(i).getAng()),tmpT.get(i).getX(),tmpT.get(i).getY());
+					g2.transform(at);
+					g2.drawImage(tmpT.get(i).getPic(),tmpT.get(i).getDX(),tmpT.get(i).getDY(),null);
+					g2.setTransform(saveXform);
+	    		}
+    		}
     	}
     	ArrayList<Platform> tmpP = level.getPlats();
     	onPlat=false;

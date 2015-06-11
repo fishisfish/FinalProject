@@ -374,13 +374,21 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
     	ArrayList<Platform> tmpP = level.getPlats();
     	ArrayList<Traps> tmpT = level.getTraps();
     	for(int i =0;i< tmpT.size();i++){
-			AffineTransform saveXform = g2.getTransform();
-			AffineTransform at = new AffineTransform();
-			at.rotate(Math.toRadians(tmpT.get(i).getAng()),camAdjust("X",tmpT.get(i).getX()),camAdjust("Y",tmpT.get(i).getY()));
-			g2.transform(at);
-			g2.drawImage(tmpT.get(i).getPic(),camAdjust("X",tmpT.get(i).getDX()),camAdjust("Y",tmpT.get(i).getDY()),this);
-			//stem.out.println(this);
-			g2.setTransform(saveXform);
+    		if (tmpT.get(i).getisSpawned()==true){
+    		
+	    		if (tmpT.get(i).getAng()==0){
+	    			g.drawImage(tmpT.get(i).getPic(),camAdjust("X",tmpT.get(i).getDX()),camAdjust("Y",tmpT.get(i).getDY()),this);
+	    		}
+	    		else{
+					AffineTransform saveXform = g2.getTransform();
+					AffineTransform at = new AffineTransform();
+					at.rotate(Math.toRadians(tmpT.get(i).getAng()),camAdjust("X",tmpT.get(i).getX()),camAdjust("Y",tmpT.get(i).getY()));
+					g2.transform(at);
+					g2.drawImage(tmpT.get(i).getPic(),camAdjust("X",tmpT.get(i).getDX()),camAdjust("Y",tmpT.get(i).getDY()),this);
+					//stem.out.println(this);
+					g2.setTransform(saveXform);
+	    		}
+    		}
     	}
     	for(int i =0;i< tmpP.size();i++){
     		
