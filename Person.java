@@ -342,7 +342,7 @@ public class Person {
     	if (inAir==true&&yVel<0){
     		fallCount+=1;
     		if (fallCount>100){
-    			System.out.println("FDEATH");
+    			System.out.println("death by falling");
     			die();	//death by falling
     		}
     	}
@@ -850,6 +850,7 @@ public class Person {
 	public int swimCheckStuff(int i, int waterWallhitCount, BufferedImage map){
 		Color cS = new Color (map.getRGB(x+rotatedPoints[i][0],y+rotatedPoints[i][1]));
 		if (cS.equals(Color.RED)==true){
+			//System.out.println("death by trap");
 			//die();		//death by trap
 			return 0;
 		}
@@ -913,6 +914,7 @@ public class Person {
 			Color c = new Color (map.getRGB(tempX,tempY));
 			Color cM = new Color (movingStuff.getRGB(tempX,tempY));
 			if (c.equals(Color.RED)==true||cM.equals(Color.RED)==true){
+			//  Systems.out.println("death by spikes");
 			//	die();		//death by trap (spike)
 			}
 			else{
@@ -949,6 +951,7 @@ public class Person {
     				if (i==6&&inAir==true){
     					System.out.println("HITGROUND");
     					if (fallCount>=70){
+    						System.out.println("death by falling2");
     						die();	//death by falling
     					}
     					hitGroundreset();
@@ -1064,6 +1067,7 @@ public class Person {
     		}
     		
     		else{
+    			System.out.println("death by being out of bounds (in water)");
     			die();	//death by being out of bounds (in water)
     		}
     	}
@@ -1075,6 +1079,7 @@ public class Person {
 
     	
     	if ((WallHits[0]==true||MovingStuffHits[0]==true)&&(WallHits[6]==true||MovingStuffHits[6]==true)){//amy waz here
+    		System.out.println("death by squishing");
     		die();	//death by squishing between two platforms (vertical)
     	}
     	if (WallHits[1]==false&&WallHits[2]==false&&WallHits[3]==false&&WallHits[5]==false&&WallHits[7]==false&&WallHits[8]==false&&clingPlat==false){
@@ -1152,23 +1157,14 @@ public class Person {
     public void checkCPoint(BufferedImage map, int i, int j){
     	ArrayList<int[]> checkPoints = level.getCheckPoints();
     	if ((new Color(map.getRGB(x+contactPoints[i][0],y+contactPoints[i][1]))).equals(Color.BLACK)){
-    		if (x+contactPoints[i][0] > checkPoints.get(j)[0] && x+contactPoints[i][0] < checkPoints.get(j)[0]+30 && y+contactPoints[i][1] > checkPoints.get(j)[1] && y+contactPoints[i][1] < checkPoints.get(j)[1]+30){
-    			if (level.getCheckPassed().get(j)!= false){
+    		if (x+contactPoints[i][0] >= checkPoints.get(j)[0] && x+contactPoints[i][0] <= checkPoints.get(j)[0]+30 && y+contactPoints[i][1] >= checkPoints.get(j)[1] && y+contactPoints[i][1] <= checkPoints.get(j)[1]+30){
+    			if (level.getCheckPassed().get(j)== false){
     				level.setCheckPassed(j);
     				System.out.println("CHECK POINT PASSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSED");
     			}
     		}
     		
-    		
     	}
     }
-    /*public boolean checkHor(){
-    //checks collision in the horizontal
-     	
-     }
-    public boolean offGround(){
-    //checks collision in the vertical
-    	
-    }*/
 
 }
