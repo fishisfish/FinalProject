@@ -15,8 +15,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class Platform{
-	private int x,y,ox,oy,dx,dy,width,height,oheight,dir,vel;
-	private double iheight;
+	private int x,y,ox,oy,dx,dy,width,height,dir,vel;
+	private double oheight,iheight; //special height keepers for ice platforms
 	private String [] data;
 	private String type;
 	private boolean falling=false;
@@ -26,7 +26,6 @@ public class Platform{
 	private int fallCount=0;
 	private int countDown=0;
 	private int squishCount=0;
-	private int meltCount=0;
 	private int bounceVel;
 	public Platform(String line){
 		data = line.split(",");
@@ -167,7 +166,7 @@ public class Platform{
 	}
 	public void regen(){
 		isMelting = false;
-		height = oheight;
+		iheight = oheight;
 	}
 	public String toString(){
 		return "{"+data[0]+","+data[1]+"}";

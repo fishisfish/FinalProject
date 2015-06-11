@@ -3,7 +3,9 @@ dimension y
 drop site x
 drop site y
 # of moving platforms
-x,y,w,h,dx,dy,direction,velocity
+x,y,w,h,dx,dy,direction,velocity,type,bounceVel
+# of checkpoints
+x,y
 
 directions:
 
