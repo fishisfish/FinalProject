@@ -196,7 +196,7 @@ public class Traps {
     		newWidth=tmp.getWidth(null);
     		newHeight=newWidth;
     		growing+=growth;
-    		System.out.println(growing);
+    		
     		if (growing==resize-1){
     			growth=-1;
     			
@@ -207,7 +207,7 @@ public class Traps {
     		}
     		return tmp;
     	}
-    	System.out.println("DER");
+    //	System.out.println("DER");
     	return resizedPic;
     	
     }

@@ -384,7 +384,7 @@ public class Person {
     	}	
     }
     public boolean jump(){
-    	System.out.println("JUMP FUNCTION CALLED. AAAA");
+    //	System.out.println("JUMP FUNCTION CALLED. AAAA");
     	if (inAir==false){//||isClinging==true||clingPlat==true){
     		System.out.println("JUMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMP");
     		isCrouching=false;
@@ -412,7 +412,7 @@ public class Person {
     		return true;
  		
     	}
-    	System.out.println("INAIRALREADY");
+    	//System.out.println("INAIRALREADY");
     	return false;
     }
     public void some(String tmp){
@@ -972,8 +972,9 @@ public class Person {
     					if (fallCount>=70){
     						die();	//death by falling
     					}
-    					hitGroundreset();
     					adjust(tempX,  y, 1, -22, "y", map);
+    					hitGroundreset();
+    					
     				}
 					if (xVel<0&&isSwimming==false&&clingPlat==false){
 						if ((i==1||i==3||i==7)&&WallHits[i]==true&&WallHits[6]==false){
@@ -998,7 +999,7 @@ public class Person {
 			
 		}
 	}
-	public void platCheckStuff(){
+	public void platCheckStuff(BufferedImage map){
 		g2 = movingStuff.createGraphics();
     	g2.setColor(Color.WHITE);
     	g2.fillRect(0,0,level.getWidth(),level.getHeight());
@@ -1035,7 +1036,7 @@ public class Person {
     		onPlat=checkPlatCollide(tmpP.get(i),onPlat);
 
     	}
-
+		
 		if (onPlat==false&&hitHead==false&&inAir==true){
 	    	for(int i =0;i< tmpP.size();i++){	
 	    			clingPlat=plateCling(tmpP.get(i),clingPlat);
