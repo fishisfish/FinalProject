@@ -45,7 +45,7 @@ public class Game extends JFrame implements ActionListener {
     public void actionPerformed(ActionEvent evt){
     	Object source = evt.getSource();
     	if (source==clockTimer){
-    		System.out.println("CLOCKCLOCKCLOCKCLOCK");
+    		//System.out.println("CLOCKCLOCKCLOCKCLOCK");
     		map.second();
     	}
     	if (source==myTimer){
@@ -251,7 +251,7 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 		camX=Math.max(400,camX);
 		camX=Math.min(level.getWidth(),camX);
 		if (chara.getinAir()==false){
-			System.out.println(camY-chara.getY());
+			//System.out.println(camY-chara.getY());
 			if (Math.abs(camY-chara.getY())>3){
 				if (Math.abs(camY-chara.getY())>50){
 					if (camY>chara.getY()){

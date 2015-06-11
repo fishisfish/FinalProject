@@ -66,6 +66,7 @@ public class Person {
     private boolean clingPlat=false;
     private boolean wasClingP=false;
     private boolean edgeCling=false;
+    private boolean pushedPlat=false;
     private boolean[] WallHits = new boolean[9];
     private boolean[] MovingStuffHits = new boolean[9];
     private boolean [] wallHitinWater = new boolean [9];
@@ -87,6 +88,7 @@ public class Person {
 	private int deathCount=0;
 	private int checkPointX,checkPointY,checkPointDir;
 	private Platform lastPlat=null;
+	private Platform ridingPlat=null;
     public Person(Level lev){
     	level = lev;
     	direction = level.getDir();
@@ -381,6 +383,7 @@ public class Person {
     		inAir=true;
     		isClinging=false;
     		clingPlat=false;
+    		wasClingP=false;
     		if (propel==true){
     			yVel=propelVel;
     		}
@@ -565,29 +568,36 @@ public class Person {
     		
     }
     public void cling(BufferedImage map){
-    		Color c1=new Color(map.getRGB(x-15,y-24));
-    		Color c2=new Color(map.getRGB(x+15,y-24));	
+    		Color c1=new Color(map.getRGB(x-16,y-24));
+    		Color c2=new Color(map.getRGB(x+16,y-24));	
     	if ((direction==LEFT&&c1.equals(GREY))||(direction==RIGHT&&c2.equals(GREY))){
-    		Color c3=new Color(map.getRGB(x-15,y-28));
-    		Color c4=new Color(map.getRGB(x+15,y-28));
+    		Color c3=new Color(map.getRGB(x-16,y-28));
+    		Color c4=new Color(map.getRGB(x+16,y-28));
+    		System.out.println("ENOUGHWALL");
     		if (c3.equals(GREY)==false&&direction==LEFT||c4.equals(GREY)==false&&direction==RIGHT){
     			edgeCling=true;
     			System.out.println("EDGECLING");
     		}
-	    	if (((direction*xVel>0&&isSinking==false&&(direction==RIGHT&&checkWallCling(RIGHT)==true||direction==LEFT&&checkWallCling(LEFT)==true))||(xVel==0&&(direction==LEFT&&checkWallCling(LEFT)==true)||(direction==RIGHT&&checkWallCling(RIGHT)==true)))&&((lastWallx!=x+15*direction)||lastPlat!=null)){
-				System.out.println("CLING-NOT WA::");
-				//System.out.
-				yVel=Math.min(yVel,0);
-			//	yVel=0;
-			//	System.out.println("yVEL3:"+yVel);
-				xVel=0;
-				isWalking=false;
-				isClinging=true;
-				doSome=false;
-				lastPlat=null;
-				lastWallx=x+15*direction;
-				apex=y;
+	    	if (direction*xVel>=0&&isSinking==false){
+	    		System.out.println("FACING+NOTSINKING");
+	    		if((direction==RIGHT&&checkWallCling(RIGHT)==true)||(direction==LEFT&&checkWallCling(LEFT)==true)||(xVel==0&&(direction==LEFT&&checkWallCling(LEFT)==true)||(direction==RIGHT&&checkWallCling(RIGHT)==true))){
+	    			System.out.println("GOOD");
+	    			if (lastWallx!=x+15*direction){
+	    				
+						System.out.println("CLING-NOT WA::");
+						yVel=Math.min(yVel,0);
+					//	yVel=0;
+					//	System.out.println("yVEL3:"+yVel);
+						xVel=0;
+						isWalking=false;
+						isClinging=true;
+						doSome=false;
+						lastPlat=null;
+						lastWallx=x+15*direction;
+						apex=y;
+	    			}
 				}
+	    	}
     	}
     }
     public void checkWalking(boolean temp){
@@ -654,6 +664,7 @@ public class Person {
     	
     }
 	public boolean checkPlatCollide(Platform plat, boolean temp){
+		boolean landed=false;
     	for (int i=0;i<9;i++){
     		int [] tmp=contactPoints[i];
     		if (i==0){
@@ -665,18 +676,19 @@ public class Person {
     		}
     		if (i==6){
 	    		if (inRange(tmp, plat, "LAND")==true){
-	    			if (i==6){//||i==7&&direction==LEFT||i==8&&direction==RIGHT){
-	    				//System.out.println("PLATEY"+plat.getY());
+	    			if (i==6||i==7&&direction==LEFT||i==8&&direction==RIGHT){
+	    				System.out.println("PLATEY"+plat.getY());
 	    				onPlat=true;
 	    				inAir=false;
+	    				landed=true;
 	    				isClinging=false;
 	    				clingPlat=false;
+	    				ridingPlat=plat;
 	    				lastPlat=null;
 	    			//	System.out.println("YYYBEFORE:      "+y);
 	    				y=plat.getY()-21;
 	    				yVel=0;
-	    			//	System.out.println("YYY:      "+y);
-	    			//	System.out.println("PLATE:      "+plat.getY());
+	    				lastWallx=x;
 	    				xplatVel=plat.getxVel();
 	    				yplatVel=plat.getyVel();
 	    				if ((plat.getType()).equals("DROPPING")==true){
@@ -687,6 +699,15 @@ public class Person {
 	    			
 	    		}
     		}
+    		if (landed==false&&((i==2||i==5)&&direction==RIGHT)||((i==1||i==3)&&direction==LEFT)||i==4){
+    			if (onPlat==true){
+    				y=ridingPlat.getY()-21;
+    			}
+    			if (inRange(tmp, plat, "CHECK")==true){
+    				runIntoWall=true;
+    				//System.out.println("HIT");
+    			}
+    		}
     	}
     	return onPlat;
     	//System.out.println(onPlat);
@@ -696,55 +717,66 @@ public class Person {
     	for (int i=0;i<9;i++){
     		int [] tmp=contactPoints[i];
 
-    		if (((i==2||i==5||i==8)&&direction==RIGHT)||((i==1||i==3||i==7)&&direction==LEFT)){
-    			if (inRange(tmp, plat, "CHECK")==true){
-    				runIntoWall=true;
-    			}
-    		}
-	    	if ((i==2||i==5)&&direction==RIGHT){
-	    			if (inRange(tmp, plat, "CLING")==true&&(wasClingP==true&&doSome==false||wasClingP==false&&lastPlat!=plat||doSome==true&&lastPlat!=plat)){
-	    				clingPlat=true;
-	    				isClinging=true;
-	    				//System.out.println("xBEFORERRR: "+x);
-	    				x=plat.getX()-13;
-	    				xplatVel=plat.getxVel();
-    					yplatVel=plat.getyVel();
-    					xVel=0;
+    		
+			if ((i==2||i==5||i==8)&&direction==RIGHT){
+			if (inRange(tmp, plat, "CLING")==true){
+				pushedPlat=true;
+				
+	    		if (inRange(contactPoints[2], plat, "CLING")==true&&((wasClingP==false&&lastPlat!=plat)||wasClingP==true)){
+					System.out.println(y-34);
+					System.out.println(plat.getY());
+		    		if (y-34<=plat.getY()){
+		    			y=plat.getY()+24;
+		    			edgeCling=true;
+		    			System.out.println("EDGECLING");
+		    		}
+	    		//(wasClingP==true&&doSome==false||wasClingP==false&&lastPlat!=plat||doSome==true&&lastPlat!=plat)){
+	    			System.out.println("NORMALCLING");
+	    			clingPlat=true;
+	    			isClinging=true;
+	    			//System.out.println("xBEFORERRR: "+x);
+	    			x=plat.getX()-12;
+	    			xplatVel=plat.getxVel();
+    				yplatVel=plat.getyVel();
+    				xVel=0;
     					//System.out.println("yVEL4"+yVel);
-    					if (yVel>0){
-    						yVel=0;
-    					}
-						isWalking=false;
+    				if (yVel>0){
+    					yVel=0;
+    				}
+					isWalking=false;
 						//isClinging=true;
-						doSome=false;
-						lastPlat=plat;
+					doSome=false;
+					lastPlat=plat;
 	    				//System.out.println("XAFTERRRR: "+x);
 	    				
 						//runIntoWall=true;
 	    			}
-	    			
-	    		}
-	    		if ((i==1||i==3)&&direction==LEFT){
-	    		//	System.out.println("LEFT-FACING");
-	    			if (inRange(tmp, plat,"CLING")==true&&(wasClingP==true&&doSome==false||wasClingP==false&&lastPlat!=plat||doSome==true&&lastPlat!=plat)){
-	    			//	System.out.println("LEFT");
-	    				clingPlat=true;
-	    				//isClinging=true;
-	    			//	System.out.println("XBEFORELLL: "+x);
-			    		x=plat.getX()+plat.getWidth()+13;
-			    		//System.out.println("XAFTERLLLL: "+x);
-			    		xplatVel=plat.getxVel();
-    					yplatVel=plat.getyVel();
+				}	
+	    	}
+	    	if ((i==1||i==3||i==7)&&direction==LEFT){
+	    		//System.out.println("LEFT-FACING");
+	    		if (inRange(contactPoints[1], plat, "CLING")==true&&((wasClingP==false&&lastPlat!=plat)||wasClingP==true)){
+	    			if (y-30<=plat.getY()){
+		    			y=plat.getY()+24;
+		    			edgeCling=true;
+		    		}
+	    			clingPlat=true;
+	    			isClinging=true;
+	    			System.out.println("XBEFORELLL: "+x);
+			    	x=plat.getX()+plat.getWidth()+12;
+			    	System.out.println("XAFTERLLLL: "+x);
+			    	xplatVel=plat.getxVel();
+    				yplatVel=plat.getyVel();
     				//	System.out.println("yVEL5"+yVel);
-    					if (yVel>0){
-    						yVel=0;
-    					}
-						isWalking=false;
-						doSome=false;
-						lastPlat=plat;
+    				if (yVel>0){
+    					yVel=0;
+    				}
+					isWalking=false;
+					doSome=false;
+					lastPlat=plat;
 						
-	    			}
 	    		}
+	    	}
     	}
 
     	return clingPlat;
@@ -779,6 +811,7 @@ public class Person {
 		hitGround=true;
 		airCount=0;
 		apex=y;
+		lastWallx=x;
 		isClinging=false;
 		clingPlat=false;
 	    lastPlat=null;
@@ -922,7 +955,7 @@ public class Person {
     					adjust(tempX,  y, 1, -22, "y", map);
     				}
 					if (xVel<0&&isSwimming==false&&clingPlat==false){
-						if ((i==1||i==3||i==7)&&WallHits[i]==true&&WallHits[6]==false){
+						if ((i==1||i==3)&&WallHits[i]==true&&WallHits[6]==false){
 							adjust(x, tempY, -1, 14, "x", map);
 							System.out.println("ADJUSTL");
 							runIntoWall=true;
@@ -931,7 +964,7 @@ public class Person {
 						}
 					}
 					if (xVel>0&&isSwimming==false&&clingPlat==false){
-						if ((i==2||i==5||i==8)&&WallHits[i]==true&&WallHits[6]==false){
+						if ((i==2||i==5)&&WallHits[i]==true&&WallHits[6]==false){
 							adjust(x, tempY, 1, -14, "x", map);
 							System.out.println("ADJUSTR");
 							runIntoWall=true;
@@ -974,11 +1007,15 @@ public class Person {
     			
     	}
 
-    	if (onPlat==true||clingPlat==true){
-    		apex=y;
+    	if (onPlat==true||clingPlat==true||pushedPlat==true){
     		x+=xplatVel;
-    		fallCount=0;
-    		y+=yplatVel;
+    		System.out.println("PUSHED: "+pushedPlat);
+    		if(onPlat==true||clingPlat==true){
+
+	    		apex=y;
+	    		fallCount=0;
+	    		y+=yplatVel;
+    		}
     	}
     	
     	wasClingP=false;
@@ -998,6 +1035,7 @@ public class Person {
     	tooLeft=false;
     	tooUp=false;
     	tooDown=false;
+		pushedPlat=false;
 		
 		platCheckStuff();
 
@@ -1065,11 +1103,24 @@ public class Person {
     }
     public void die(){
    		deathCount++;
+   		int lastCheck=-1;
+   		for (int i=0;i<level.getCheckPassed().size();i++){
+   			
+   			if (level.getCheckPassed().get(i)==true){
+   				lastCheck=i;
+   			}	
+   		}
+   		
     	x = checkPointX;
     	y = checkPointY-50;
+    	if (lastCheck>-1){
+   			x = level.getCheckPoints().get(lastCheck)[0];
+    		y = level.getCheckPoints().get(lastCheck)[1];
+   		}
+    	
     	xVel = 0;
     	yVel = 0;
-    	//System.out.println("yVEL7:"+yVel);
+    
     	direction = checkPointDir;
     	headAngle = 90;
     	apex = y;

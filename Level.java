@@ -60,7 +60,7 @@ public class Level {
 			int [] temp = {x,y};
 			checkPoints.add(temp);
 			int j = i + 1;
-			System.out.println("Maps/"+levelNum+"/"+j+".png");
+		//	System.out.println("Maps/"+levelNum+"/"+j+".png");
 			checkPics.add(new ImageIcon("Maps/"+levelNum+"/"+j+".png").getImage());
 			checkPointsPassed.add(false);
     	}
@@ -83,7 +83,7 @@ public class Level {
     }
     public void setCheckPassed(int num){
     	checkPointsPassed.set(num,true);
-    	System.out.println("changed");
+    //	System.out.println("changed");
     }
     public int getWidth(){return width;}
     public int getHeight(){return height;}
