@@ -948,7 +948,7 @@ public class Person {
 			Color cM = new Color (movingStuff.getRGB(tempX,tempY));
 			if (c.equals(Color.RED)==true||cM.equals(Color.RED)==true){
 				System.out.println("TRAP-DEATH");
-				die();		//death by trap (spike)
+				//die();		//death by trap (spike)
 			}
 			else{
     			WallHits[i]=c.equals(GREY);
