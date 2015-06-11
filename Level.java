@@ -144,9 +144,17 @@ public class Level {
     public boolean checkInSight(int camX, int camY, int platNum){
     	int iceX = movingPlats.get(platNum).getX();
     	int iceY = movingPlats.get(platNum).getY();
-    	System.out.println("HORIZONTAL: " +Math.abs(camX-iceX));
-    	System.out.println("VERTICAL: "+Math.abs(camY-iceY));
-    	if ((Math.abs(camX-iceX)<=400 && Math.abs(camX-iceY)<=300) /*|| (Math.abs(camX-(iceX+movingPlats.get(platNum).getWidth()))<=400 && Math.abs(camX-(iceY+movingPlats.get(platNum).getHeight()))<=300)*/){
+    	boolean hor = false;
+    	boolean ver = false;
+    	if(Math.abs(camX-iceX) <= 400){
+    		hor = true;
+    	}
+    	if(Math.abs(camY-iceY) <= 300){
+    		ver = true;
+    	}
+    	//System.out.println("HORIZONTAL: " +Math.abs(camX-iceX)+", "+hor);
+    	//System.out.println("VERTICAL: "+Math.abs(camY-iceY)+", "+ver);
+    	if (hor ==true && ver ==true /*|| (Math.abs(camX-(iceX+movingPlats.get(platNum).getWidth()))<=400 && Math.abs(camX-(iceY+movingPlats.get(platNum).getHeight()))<=300)*/){
     		System.out.println("PEEEEEKABOO");
     		return true;
     	}

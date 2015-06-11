@@ -424,7 +424,6 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
     		}
     	}
     	else{
-    	
 			AffineTransform saveXform = g2.getTransform();
 			AffineTransform at = new AffineTransform();
 			at.rotate(Math.toRadians((90-chara.getAn())%360),camAdjust("X",chara.getX()),camAdjust("Y",chara.getY()));

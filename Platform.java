@@ -16,6 +16,7 @@ import java.util.LinkedList;
 
 public class Platform{
 	private int x,y,ox,oy,dx,dy,width,height,oheight,dir,vel;
+	private double iheight;
 	private String [] data;
 	private String type;
 	private boolean falling=false;
@@ -42,6 +43,9 @@ public class Platform{
 		vel = Integer.parseInt(data[7]);
 		type=data[8];
 		System.out.println(type);
+		if(type.equals("ICE")){
+			iheight = height;
+		}
 		bounceVel= Integer.parseInt(data[9]);
 		//System.out.println(data[8]);
 	}
@@ -90,7 +94,11 @@ public class Platform{
 		return squishCount;
 	}
 	public int getWidth(){return width;}
-	public int getHeight(){return height;}
+	public int getHeight(){
+		if(type.equals("ICE")){
+			return (int)(iheight);
+		}
+		return height;}
 	
 	public void move(){
 		if (dx!=0){
@@ -153,7 +161,8 @@ public class Platform{
 			squishCount+=1;
 		}
 		if(isMelting==true){
-			System.out.println("MELTTTTTINNNNNGNGGG");
+			iheight -= 0.01;
+			iheight = Math.max(0,iheight);
 		}
 	}
 	public void regen(){
