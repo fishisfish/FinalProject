@@ -124,6 +124,7 @@ public class Traps {
     				//System.out.println("x: "+x+"\ny:"+y);
     			}
     			//System.out.println("SPAWM");
+    			System.out.println("x: "+x+"    y: "+y);
 	    		Color c = new Color (map.getRGB(x,y));
 	    		if (c.equals(GREY)==true){
 	    			Color c1 = new Color (map.getRGB(x+1,y));

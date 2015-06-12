@@ -26,7 +26,7 @@ public class Game extends JFrame implements ActionListener {
  		super("Game");
 	 	setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
  		setSize(800,600);
- 		for (int i=0;i<2;i++){
+ 		for (int i=0;i<5;i++){
  			Level temp= new Level (i+1);
  			loadedLevels.add(temp);
  		}
@@ -94,7 +94,7 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 		mosY=0;
 		
 		int lev = 2; //chooseLevel();
-		level = loadedLevels.get(0);//new Level(lev);
+		level = loadedLevels.get(2);//new Level(lev);
 		chara=new Person(level);
 		chara.setX(level.getDropx());
 		chara.setY(level.getDropy());
