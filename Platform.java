@@ -72,7 +72,7 @@ public class Platform{
 	}
 	public void fallPrepare(){
 		if (willFall==false){
-			countDown=5;	
+			countDown=30;	
 			willFall=true;
 		}
 		

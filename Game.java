@@ -26,11 +26,9 @@ public class Game extends JFrame implements ActionListener {
  		super("Game");
 	 	setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
  		setSize(800,600);
- 		for (int i=0;i<1;i++){
+ 		for (int i=0;i<2;i++){
  			Level temp= new Level (i+1);
  			loadedLevels.add(temp);
- 		}
- 		for (int i=0;i<10000000;i++){
  		}
  		myTimer = new Timer(10,this);
  		clockTimer = new Timer (1000,this);
@@ -81,6 +79,7 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 	private Person chara;
 	private Level level;
 	private int timePassed=0;
+	private int dyingCount=0;
 	private static final int RIGHT=1;
 	private static final int LEFT=-1;
 	private Color ORANGE = new Color (255,153,0);
@@ -94,13 +93,13 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 		mosX=0;
 		mosY=0;
 		
-		int lev = 1; //chooseLevel();
+		int lev = 2; //chooseLevel();
 		level = loadedLevels.get(0);//new Level(lev);
 		chara=new Person(level);
 		chara.setX(level.getDropx());
 		chara.setY(level.getDropy());
 		camX=level.getDropx();
-		camY=level.getDropy()-300;
+		camY=level.getDropy()-100;
 		white = new ImageIcon("white2.png").getImage();
 	//	System.out.println("dd");
 		keys = new boolean[65535];
@@ -128,10 +127,18 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 		return lev;
 	}
 	public void move(){
-		chara.checkHit(level.getMap());
-		moveLevel();
-		moveChara();
-		moveCam();
+		if(dyingCount==0){
+			chara.checkHit(level.getMap());
+			moveLevel();
+			moveChara();
+			moveCam();
+		}
+		else if(dyingCount >0 && dyingCount<100000){
+			dyingCount++;
+		}
+		else{
+			dyingCount=0;
+		}
 		
 	} 
 	public void second(){

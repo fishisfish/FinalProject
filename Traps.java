@@ -116,11 +116,12 @@ public class Traps {
     			if (dx==0){
     				x=ox;
 					isSpawned=false;
-					spawnCount=30;
-					y=ox;
+					spawnCount=1;
+					y=oy;
 					dx=dy;
 					dirx=odirx;
     				diry=odiry;
+    				//System.out.println("x: "+x+"\ny:"+y);
     			}
     			//System.out.println("SPAWM");
 	    		Color c = new Color (map.getRGB(x,y));
@@ -132,9 +133,15 @@ public class Traps {
 	    			
 	    			if (c1.equals(GREY)==false||c2.equals(GREY)==false){
 	    				dirx*=-1;
+	    				//System.out.println("x");
 	    			}
 	    			else if (c3.equals(GREY)==false||c4.equals(GREY)==false){
 	    				diry*=-1;
+	    				//System.out.println("y");
+	    			}
+	    			else{
+	    				diry*=-1;
+	    				dirx*=-1;
 	    			}
 	    		}
 	    		x += velx*dirx;
@@ -207,7 +214,7 @@ public class Traps {
     		}
     		return tmp;
     	}
-    	System.out.println("DER");
+    	//System.out.println("DER");
     	return resizedPic;
     	
     }
