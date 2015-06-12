@@ -363,7 +363,7 @@ public class Person {
     	}
     	if (inAir==true&&yVel<0){
     		fallCount+=1;
-    		if (fallCount>100){
+    		if (fallCount>200){
     			System.out.println("death by falling");
     			die();	//death by falling
     		}
@@ -387,10 +387,20 @@ public class Person {
     	else if (isWalking==false&&Math.abs(xVel)>0){
     		double tmp;
     		if(onIce == false){
-				tmp=xVel+direction*-1*slideCoefficient;
+    			if(direction*xVel>0){
+    				tmp=xVel+direction*-1*slideCoefficient;
+    			}
+				else{
+					tmp=xVel+direction*slideCoefficient;
+				}
     		}
     		else{
-    			tmp=xVel+direction*-1*iceCoefficient;
+    			if(direction*xVel>0){
+    				tmp=xVel+direction*-1*iceCoefficient;
+    			}
+				else{
+					tmp=xVel+direction*iceCoefficient;
+				}
     		}
 			if (tmp*xVel<0){
 	    		xVel=0;
@@ -924,7 +934,7 @@ public class Person {
 		Color cSm = new Color (movingStuff.getRGB(x+rotatedPoints[i][0],y+rotatedPoints[i][1]));
 		if (cS.equals(Color.RED)==true||cSm.equals(Color.RED)==true){
 			//System.out.println("death by trap");
-			//die();		//death by trap
+			die();		//death by trap
 			return 0;
 		}
 		else{
@@ -996,7 +1006,7 @@ public class Person {
 			Color cM = new Color (movingStuff.getRGB(tempX,tempY));
 			if (c.equals(Color.RED)==true||cM.equals(Color.RED)==true){
 				System.out.println("TRAP-DEATH");
-			//	die();		//death by trap (spike)
+				die();		//death by trap (spike)
 			}
 			else{
     			WallHits[i]=c.equals(GREY);
@@ -1034,7 +1044,7 @@ public class Person {
     				}
     				if (i==6&&inAir==true){
     					System.out.println("HITGROUND");
-    					if (fallCount>=70){
+    					if (fallCount>=150){
     						System.out.println("death by falling2");
     						die();	//death by falling
     					}
@@ -1042,7 +1052,7 @@ public class Person {
     					adjust(tempX,  y, 1, -22, "y", map);
     				}
 					if (xVel<0&&isSwimming==false&&clingPlat==false){
-						if ((i==1||i==3||i==7)&&WallHits[i]==true&&WallHits[6]==false){
+						if ((i==1||i==3||i==7)&&WallHits[i]==true){
 							adjust(x, tempY, -1, 14, "x", map);
 							System.out.println("ADJUSTL");
 							runIntoWall=true;
@@ -1052,7 +1062,7 @@ public class Person {
 						}
 					}
 					if (xVel>0&&isSwimming==false&&clingPlat==false){
-						if ((i==2||i==5||i==8)&&WallHits[i]==true&&WallHits[6]==false){
+						if ((i==2||i==5||i==8)&&WallHits[i]==true){
 							adjust(x, tempY, 1, -14, "x", map);
 							System.out.println("ADJUSTR");
 							runIntoWall=true;
@@ -1153,6 +1163,7 @@ public class Person {
 		
 		
 		platCheckStuff();
+		//System.out.println(clingPlat);
 		//System.out.println("APLAT"+yVel);
     	int waterWallhitCount=0;
     	for (int i=0;i<9;i++){
@@ -1230,7 +1241,7 @@ public class Person {
     	//System.out.println(runIntoWall);
     }
     public void die(){
-    	death=false;
+    	death=true;
    		deathCount++;
    		int lastCheck=-1;
    		for (int i=0;i<level.getCheckPassed().size();i++){
