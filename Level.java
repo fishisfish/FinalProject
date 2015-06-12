@@ -21,6 +21,8 @@ public class Level {
 	private ArrayList<Image> checkPics = new ArrayList<Image>();
 	private ArrayList<int[]> checkPoints = new ArrayList<int[]>();
 	private ArrayList<Boolean> checkPointsPassed = new ArrayList<Boolean>();
+	private ArrayList<int[]> keyPoints = new ArrayList<int[]>();
+	private ArrayList<Boolean> keyAvailable = new ArrayList<Boolean>();
 	private int width,height,dropx,dropy,direction;
 	private Scanner infile = null;
     private	Scanner trapfile = null;
@@ -51,6 +53,7 @@ public class Level {
     	loadCP();
     	//load traps
     	loadTrap();	
+    	loadKeys();		
     	System.out.println("DONE");//	<=============to be completed
     }
     public void loadTrap(){
@@ -89,6 +92,20 @@ public class Level {
 			checkPointsPassed.add(false);
     	}
     }
+    public void loadKeys(){
+    	int num3 = Integer.parseInt(infile.nextLine());
+    	for (int i = 0; i<num3;i++){
+    		String line = infile.nextLine();
+    		String [] data = line.split(",");
+    		int x = Integer.parseInt(data[0]);
+			int y = Integer.parseInt(data[1]);
+			int [] temp = {x,y};
+			keyPoints.add(temp);
+
+		//	System.out.println("Maps/"+levelNum+"/"+j+".png");
+			keyAvailable.add(true);
+    	}
+    }
     public BufferedImage getMap(){
     	return map;
     }
@@ -110,6 +127,16 @@ public class Level {
     public void setCheckPassed(int num){
     	checkPointsPassed.set(num,true);
     	System.out.println("changed");
+    }
+    public ArrayList<int[]> getkeyPoints(){
+    	return keyPoints;
+    }
+    public ArrayList<Boolean> getkeyAvailable(){
+    	return keyAvailable;
+    }
+    public void setkeyGot(int num){
+    	keyAvailable.set(num,false);
+    //	System.out.println("changed");
     }
     public int getWidth(){return width;}
     public int getHeight(){return height;}
@@ -157,7 +184,7 @@ public class Level {
     	//System.out.println("HORIZONTAL: " +Math.abs(camX-iceX)+", "+hor);
     	//System.out.println("VERTICAL: "+Math.abs(camY-iceY)+", "+ver);
     	if (hor ==true && ver ==true /*|| (Math.abs(camX-(iceX+movingPlats.get(platNum).getWidth()))<=400 && Math.abs(camX-(iceY+movingPlats.get(platNum).getHeight()))<=300)*/){
-    		System.out.println("PEEEEEKABOO");
+    		//System.out.println("PEEEEEKABOO");
     		return true;
     	}
     	else{

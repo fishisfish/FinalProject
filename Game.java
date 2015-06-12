@@ -30,8 +30,6 @@ public class Game extends JFrame implements ActionListener {
  			Level temp= new Level (i+1);
  			loadedLevels.add(temp);
  		}
- 		for (int i=0;i<10000000;i++){
- 		}
  		myTimer = new Timer(10,this);
  		clockTimer = new Timer (1000,this);
  		map=new GamePanel(this,loadedLevels);
@@ -69,7 +67,7 @@ public class Game extends JFrame implements ActionListener {
 }
  
 class GamePanel extends JPanel implements MouseListener, MouseMotionListener, KeyListener{ 
-	private Image white;
+	private Image white,lockedPic,keyPic, haskeyPic;
 	private Game mainFrame;
 	private int mosX,mosY,ncamX,ncamY,camX,camY;
 	private boolean keyPressed;
@@ -87,6 +85,7 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 	private Color INDIGO = new Color (138,0,255);
 	private Color YELLOW = new Color(255,252,118);
 	private Color ICE = new Color(170,255,236);
+	private Color BLUE = new Color (0,165,255);
 	private Font font;
 	public GamePanel(Game m, ArrayList<Level> loadedLevels){
 		mainFrame=m;
@@ -94,7 +93,7 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 		mosX=0;
 		mosY=0;
 		
-		int lev = 1; //chooseLevel();
+		int lev = 2; //chooseLevel();
 		level = loadedLevels.get(0);//new Level(lev);
 		chara=new Person(level);
 		chara.setX(level.getDropx());
@@ -102,6 +101,9 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 		camX=level.getDropx();
 		camY=level.getDropy()-300;
 		white = new ImageIcon("white2.png").getImage();
+		lockedPic= new ImageIcon("Images/Interactives/LOCKED.png").getImage();
+		keyPic= new ImageIcon("Images/Interactives/key.png").getImage();
+		haskeyPic= new ImageIcon("Images/Interactives/HasKey.png").getImage();
 	//	System.out.println("dd");
 		keys = new boolean[65535];
 		addMouseListener(this);
@@ -189,6 +191,9 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 				}
 			}
 			else if (keys[KeyEvent.VK_DOWN]){
+				if (chara.getCling()==true||chara.getPCling()==true){
+					chara.wallPush();
+				}
 				chara.slide();
 			}
 			
@@ -368,8 +373,15 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
     @Override
     public void paintComponent(Graphics g){
     	Graphics2D g2 = (Graphics2D)g;
+    	Image pic=chara.getPic();
     	g.drawImage(white,0,0,this);
-    	
+    	ArrayList<int[]> keyPoints = level.getkeyPoints();
+		
+		for (int i=0;i < keyPoints.size();i++){
+			if(level.getkeyAvailable().get(i) == true){
+				g.drawImage(keyPic,camAdjust("X",keyPoints.get(i)[0]),camAdjust("Y",keyPoints.get(i)[1]),this);
+			}
+		}
     	ArrayList<Platform> tmpP = level.getPlats();
     	ArrayList<Traps> tmpT = level.getTraps();
     	ArrayList<Traps> swingSaw = new ArrayList<Traps>();
@@ -393,6 +405,18 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 	    		}
     		}
     	}
+    	if (chara.getSwim()==true){//&&chara.getBreathCount()<99500){
+    		AffineTransform saveXform = g2.getTransform();
+			AffineTransform at = new AffineTransform();
+			at.rotate(Math.toRadians((90-chara.getAn())%360),camAdjust("X",chara.getX()),camAdjust("Y",chara.getY()));
+			g2.transform(at);
+			g2.drawImage(pic,camAdjust("X",chara.getX()-(int)(pic.getWidth(null)/2)),camAdjust("Y",chara.getY()-(int)(pic.getHeight(null)/2)),this);
+			g2.setTransform(saveXform);
+			
+			int tmp=(int)(chara.getBreathCount()/100);
+			g.setColor(BLUE);
+			g.fillRect(75,60,tmp,10);
+		}
     	g.drawImage(level.getMap(),camAdjust("X",0),camAdjust("Y",0),this);
     	g.drawRect(camAdjust("X",chara.getX()-15),camAdjust("Y",chara.getY())-25,30,45);
     	
@@ -402,22 +426,28 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
     	 //DRAW PLATFORMS
     	//	System.out.println("TYPE:"+tmpP.get(i).getType());
     	//	System.out.println();
-    		if ((tmpP.get(i).getType()).equals("MOVING")==true){
-    		//	System.out.println("ORANGE");
-    			g.setColor(ORANGE);
+    		if ((tmpP.get(i).getType()).equals("LOCKED")==true&&(tmpP.get(i).getLocked()==true)){
+    			g.drawImage(lockedPic,camAdjust("X",tmpP.get(i).getX()),camAdjust("Y",tmpP.get(i).getY()),this);
     		}
-    		if ((tmpP.get(i).getType()).equals("DROPPING")==true){
-    			//System.out.println("INDIGO");
-    			g.setColor(INDIGO);
-    		}
-    		if ((tmpP.get(i).getType()).equals("BOUNCING")==true){
-    			g.setColor(YELLOW);
-    		}
-    		if ((tmpP.get(i).getType()).equals("ICE")==true){
-    			g.setColor(ICE);
-    			//System.out.println("ICE");
-    		}
-    		g.fillRect(camAdjust("X",tmpP.get(i).getX()),camAdjust("Y",tmpP.get(i).getY()),tmpP.get(i).getWidth(),tmpP.get(i).getHeight());
+    		else if ((tmpP.get(i).getType()).equals("LOCKED")==false){
+    		
+	    		if ((tmpP.get(i).getType()).equals("MOVING")==true){
+	    		//	System.out.println("ORANGE");
+	    			g.setColor(ORANGE);
+	    		}
+	    		if ((tmpP.get(i).getType()).equals("DROPPING")==true){
+	    			//System.out.println("INDIGO");
+	    			g.setColor(INDIGO);
+	    		}
+	    		if ((tmpP.get(i).getType()).equals("BOUNCING")==true){
+	    			g.setColor(YELLOW);
+	    		}
+	    		if ((tmpP.get(i).getType()).equals("ICE")==true){
+	    			g.setColor(ICE);
+	    			//System.out.println("ICE");
+	    		}
+	    		g.fillRect(camAdjust("X",tmpP.get(i).getX()),camAdjust("Y",tmpP.get(i).getY()),tmpP.get(i).getWidth(),tmpP.get(i).getHeight());
+	    	}
     	}
     	for(int i =0;i< swingSaw.size();i++){
     		AffineTransform saveXform = g2.getTransform();
@@ -429,13 +459,12 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
     	}
     		
     	ArrayList<Image> checkPics = level.getCheckPics();
-		ArrayList<int[]> checkPoints = level.getCheckPoints();
 		for (int i=0;i < checkPics.size();i++){
 			if(level.getCheckPassed().get(i) == true){
 				g.drawImage(checkPics.get(i),camAdjust("X",0),camAdjust("Y",0),this);
 			}
 		}
-    	Image pic=chara.getPic();
+    	
     	if (chara.getSwim()==false){
     		
     		if (chara.getCling()==false){
@@ -445,20 +474,18 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
     			g.drawImage(pic,camAdjust("X",chara.getX()-(int)(pic.getWidth(null)/2)+chara.getDir()*5),camAdjust("Y",chara.getY()-(int)(pic.getHeight(null)/2)),this);
     		}
     	}
-    	else{
-			AffineTransform saveXform = g2.getTransform();
-			AffineTransform at = new AffineTransform();
-			at.rotate(Math.toRadians((90-chara.getAn())%360),camAdjust("X",chara.getX()),camAdjust("Y",chara.getY()));
-			g2.transform(at);
-			g2.drawImage(pic,camAdjust("X",chara.getX()-(int)(pic.getWidth(null)/2)),camAdjust("Y",chara.getY()-(int)(pic.getHeight(null)/2)),this);
-			g2.setTransform(saveXform);
-			
-    	}
 
     	g.setFont(font); 
 		g.setColor(Color.BLACK);
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON); //makes the font pretty when its drawn
 		g.drawString(getTime(timePassed),700,40);
+		g.drawString(chara.getDeathCount()+" DEATHS!",50,40);
+		if (chara.gethasKey()==true){
+			g.drawImage(haskeyPic,250,20,this);
+		}
+
+		
+		
     }
     public void mouseReleased(MouseEvent e){
     	mousePressed=false;
