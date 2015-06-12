@@ -23,10 +23,12 @@ public class Platform{
 	private boolean willFall=false;
 	private boolean isBouncing=false;
 	private boolean isMelting=false;
+	private boolean isLocked;
 	private int fallCount=0;
 	private int countDown=0;
 	private int squishCount=0;
 	private int bounceVel;
+	private int lockType;
 	public Platform(String line){
 		data = line.split(",");
 		x = Integer.parseInt(data[0]);
@@ -41,15 +43,23 @@ public class Platform{
 		dir = Integer.parseInt(data[6]);
 		vel = Integer.parseInt(data[7]);
 		type=data[8];
+		
 		System.out.println(type);
 		if(type.equals("ICE")){
 			iheight = height;
 		}
 		bounceVel= Integer.parseInt(data[9]);
+		lockType=Integer.parseInt(data[10]);
+		if (type.equals("LOCKED")==true){
+			isLocked=true;
+		}
 		//System.out.println(data[8]);
 	}
 	public int getX(){;return x;}
 	public int getY(){return y;}
+	public boolean getLocked(){
+		return isLocked;
+	}
 	public int getxVel(){
 		if (dx!=0){
 			return vel*dir;
@@ -76,6 +86,24 @@ public class Platform{
 			willFall=true;
 		}
 		
+	}
+	public void unLock(){
+		isLocked=false;
+		if (lockType!=0){
+			type="BOUNCING";
+			x+=28;
+			y+=29;
+			width=44;
+			height=42;
+		}
+		else{
+			if (lockType!=0){
+				x=0;
+				y=0;
+				width=0;
+				height=0;
+		}
+		}
 	}
 	public void bounce(){
 		isBouncing=true;

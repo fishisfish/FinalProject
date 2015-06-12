@@ -72,7 +72,7 @@ public class Traps {
     	spawnCount=Integer.parseInt(data[11]);
     	resize=Integer.parseInt(data[12]);
     	type=Integer.parseInt(data[13]);
-    	System.out.println("width "+newWidth);
+    	//System.out.println("width "+newWidth);
     	
     	if (type==2||type==6){
     		isSpawned=false;
@@ -204,7 +204,7 @@ public class Traps {
     		newWidth=tmp.getWidth(null);
     		newHeight=newWidth;
     		growing+=growth;
-    		System.out.println(growing);
+    		//System.out.println(growing);
     		if (growing==resize-1){
     			growth=-1;
     			
