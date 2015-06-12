@@ -21,18 +21,13 @@ import java.util.LinkedList;
 public class Game extends JFrame implements ActionListener {
 	Timer myTimer,clockTimer;
  	GamePanel map;
- 	ArrayList<Level> loadedLevels= new ArrayList<Level>();
  	public Game() {  //setting up graphic bits
  		super("Game");
 	 	setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
  		setSize(800,600);
- 		for (int i=0;i<5;i++){
- 			Level temp= new Level (i+1);
- 			loadedLevels.add(temp);
- 		}
  		myTimer = new Timer(10,this);
  		clockTimer = new Timer (1000,this);
- 		map=new GamePanel(this,loadedLevels);
+ 		map=new GamePanel(this);
  		map.setLocation(0,0);
  		map.setSize(800,600);
  		add(map);
@@ -50,15 +45,20 @@ public class Game extends JFrame implements ActionListener {
     }
     public void actionPerformed(ActionEvent evt){
     	Object source = evt.getSource();
-    	if (source==clockTimer){
-    		//System.out.println("CLOCKCLOCKCLOCKCLOCK");
-    		map.second();
+    	if (map.getChara().getLevelDone()==false){
+
+	    	if (source==clockTimer){
+	    		map.second();
+	    	}
+	    	if (source==myTimer){
+	    		map.move();
+	    		
+	    	}
     	}
-    	if (source==myTimer){
-    		map.move();
-    		map.repaint();
+    	if (map.getChara().getLevelDone()==true){
+    		map.suck();
     	}
-    	
+    	map.repaint();
     		
     	
 		
@@ -88,15 +88,17 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 	private Color ICE = new Color(170,255,236);
 	private Color BLUE = new Color (0,165,255);
 	private Font font;
-	public GamePanel(Game m, ArrayList<Level> loadedLevels){
+	private String onScreen = "GAME";
+	public GamePanel(Game m){
 		mainFrame=m;
 		load();
 		mosX=0;
 		mosY=0;
 		
 		int lev = 2; //chooseLevel();
-		level = loadedLevels.get(2);//new Level(lev);
-		chara=new Person(level);
+		level = new Level (1);//new Level(lev);
+		chara=new Person();
+		chara.setLevel(level);
 		chara.setX(level.getDropx());
 		chara.setY(level.getDropy());
 		camX=level.getDropx();
@@ -130,6 +132,9 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 		int lev = kb.nextInt();
 		return lev;
 	}
+	public Person getChara(){
+		return chara;
+	}
 	public void move(){
 		if(dyingCount==0){
 			chara.checkHit(level.getMap());
@@ -145,6 +150,14 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 		}
 		
 	} 
+	public void suck(){
+		chara.suck();
+		if (chara.getScale()==0){
+		
+			onScreen="LEVELSELECT";
+			System.out.println("BACL");
+		}
+	}
 	public void second(){
 		timePassed+=1;	
 	}
@@ -379,8 +392,7 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
         requestFocus();
         //mainFrame.start();
     }
-    @Override
-    public void paintComponent(Graphics g){
+    public void gamePaint(Graphics g){
     	Graphics2D g2 = (Graphics2D)g;
     	Image pic=chara.getPic();
     	g.drawImage(white,0,0,this);
@@ -414,7 +426,7 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 	    		}
     		}
     	}
-    	if (chara.getSwim()==true){//&&chara.getBreathCount()<99500){
+    	if (chara.getSwim()==true&&chara.getLevelDone()==false){//&&chara.getBreathCount()<99500){
     		AffineTransform saveXform = g2.getTransform();
 			AffineTransform at = new AffineTransform();
 			at.rotate(Math.toRadians((90-chara.getAn())%360),camAdjust("X",chara.getX()),camAdjust("Y",chara.getY()));
@@ -474,7 +486,7 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 			}
 		}
     	
-    	if (chara.getSwim()==false){
+    	if (chara.getSwim()==false&&chara.getLevelDone()==false){
     		
     		if (chara.getCling()==false){
 	    		g.drawImage(pic,camAdjust("X",chara.getX()-(int)(pic.getWidth(null)/2)),camAdjust("Y",chara.getY()-(int)(pic.getHeight(null)/2)),this);
@@ -483,7 +495,17 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
     			g.drawImage(pic,camAdjust("X",chara.getX()-(int)(pic.getWidth(null)/2)+chara.getDir()*5),camAdjust("Y",chara.getY()-(int)(pic.getHeight(null)/2)),this);
     		}
     	}
-
+		if (chara.getLevelDone()==true){
+			AffineTransform saveXform = g2.getTransform();
+			AffineTransform at = new AffineTransform();
+			at.rotate(Math.toRadians((90-chara.getAn())%360),camAdjust("X",(int)(chara.getX())),camAdjust("Y",(int)(chara.getY())));
+			g2.transform(at);                                 
+   			g2.setComposite(AlphaComposite.SrcOver.derive((float)chara.getScale())); 
+			g2.drawImage(pic,camAdjust("X",chara.getX()-(int)(pic.getWidth(null)/2)),camAdjust("Y",chara.getY()-(int)(pic.getHeight(null)/2)),this);
+			g2.setTransform(saveXform);
+		
+			
+		}  
     	g.setFont(font); 
 		g.setColor(Color.BLACK);
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON); //makes the font pretty when its drawn
@@ -492,6 +514,13 @@ class GamePanel extends JPanel implements MouseListener, MouseMotionListener, Ke
 		if (chara.gethasKey()==true){
 			g.drawImage(haskeyPic,250,20,this);
 		}
+    }
+    @Override
+    public void paintComponent(Graphics g){
+    	if (onScreen.equals("GAME")){
+    		gamePaint(g);
+    	}
+    	
 
 		
 		

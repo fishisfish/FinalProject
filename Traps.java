@@ -77,12 +77,12 @@ public class Traps {
     	if (type==2||type==6){
     		isSpawned=false;
     	}
-    	System.out.println("Images/Interactives/"+type+".png");
+    	//System.out.println("Images/Interactives/"+type+".png");
     	pic =new ImageIcon("Images/Interactives/"+type+".png").getImage();
-    	resizedPic=pic.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
+    	resizedPic=pic.getScaledInstance(newWidth, newHeight, Image.SCALE_FAST);
     	if (resize!=0){
     		for (int i=0;i<resize+1;i++){
-    			Image temp=pic.getScaledInstance(newWidth+i, newHeight+i, Image.SCALE_DEFAULT);
+    			Image temp=pic.getScaledInstance(newWidth+i, newHeight+i, Image.SCALE_FAST);
     			resizedPics.add(temp);
     		}
     		
@@ -102,12 +102,24 @@ public class Traps {
     	ang=(ang+angVel)%360;
     	if (type==2){
     		if (isSpawned==true){
-	    		x += velx*dirx;
-				if ((x-ox)*dirx==dx){
-					
-					x=ox;
-					isSpawned=false;
-					spawnCount=30;
+    			if (velx!=0){
+    			
+		    		x += velx*dirx;
+					if ((x-ox)*dirx==dx){
+						
+						x=ox;
+						isSpawned=false;
+						spawnCount=30;
+					}
+				}
+				if (vely!=0){
+					y += vely*diry;
+					if ((y-oy)*diry==dy){
+						
+						y=oy;
+						isSpawned=false;
+						spawnCount=30;
+					}
 				}
     		}
     	}
@@ -124,7 +136,7 @@ public class Traps {
     				//System.out.println("x: "+x+"\ny:"+y);
     			}
     			//System.out.println("SPAWM");
-    			System.out.println("x: "+x+"    y: "+y);
+    			//System.out.println("x: "+x+"    y: "+y);
 	    		Color c = new Color (map.getRGB(x,y));
 	    		if (c.equals(GREY)==true){
 	    			Color c1 = new Color (map.getRGB(x+1,y));

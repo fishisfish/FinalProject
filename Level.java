@@ -26,6 +26,7 @@ public class Level {
 	private int width,height,dropx,dropy,direction;
 	private Scanner infile = null;
     private	Scanner trapfile = null;
+    private int [] endPoint = new int [] {0,0};
     String levelNum="";
     public Level(int lev) {
     	levelNum = lev + "";
@@ -53,7 +54,12 @@ public class Level {
     	loadCP();
     	//load traps
     	loadTrap();	
-    	loadKeys();		
+    	loadKeys();	
+    	String temp = infile.nextLine();
+    	String [] tmp = temp.split(",");
+    	System.out.println(tmp[0]);
+    	endPoint[0]=Integer.parseInt(tmp[0]);
+    	endPoint[1]=Integer.parseInt(tmp[1]);	
     	System.out.println("DONE");//	<=============to be completed
     }
     public void loadTrap(){
@@ -105,6 +111,9 @@ public class Level {
 		//	System.out.println("Maps/"+levelNum+"/"+j+".png");
 			keyAvailable.add(true);
     	}
+    }
+    public int [] getEP(){
+    	return endPoint;
     }
     public BufferedImage getMap(){
     	return map;

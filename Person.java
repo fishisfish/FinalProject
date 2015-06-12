@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import javax.imageio.ImageIO;
 public class Person {
-	private int x,y,walkCount,airCount,swimCount,breathCount,breathReset,picStall,stopSwim, jumpVel, propelVel,levelSizeX,levelSizeY;
+	private int x,y,walkCount,airCount,swimCount,breathCount,breathReset,picStall,stopSwim, jumpVel, propelVel,levelSizeX,levelSizeY,keyNum;
 	private ArrayList<ArrayList<ArrayList<Image>>> allPics = new ArrayList<ArrayList<ArrayList<Image>>>();
 	private ArrayList<ArrayList<Image>> leftPics = new ArrayList<ArrayList<Image>>();
 	private ArrayList<ArrayList<Image>> rightPics = new ArrayList<ArrayList<Image>>();
@@ -28,7 +28,7 @@ public class Person {
 	private String [] picNames = new String []{"Walk", "Jump", "Some", "Slid", "Swim", "Dead"};
 	private int [] frameTotal = new int []{0,0,0,0,0,0};
 	private Image temp= new ImageIcon("profile.png").getImage();
-	private double xVel,yVel,sVel,slideCoefficient,clingCoefficient,iceCoefficient;
+	private double xVel,yVel,sVel,slideCoefficient,clingCoefficient,iceCoefficient,scale;
 	private int headAngle;
 	private int direction;
 	private int swimDir=1;
@@ -72,6 +72,7 @@ public class Person {
     private boolean death=false;
     private boolean onIce=false;
     private boolean hasKey=false;
+    private boolean levelDone=false;
     private boolean[] WallHits = new boolean[9];
     private boolean[] MovingStuffHits = new boolean[9];
     private boolean [] wallHitinWater = new boolean [9];
@@ -96,29 +97,37 @@ public class Person {
 	private int checkPointX,checkPointY,checkPointDir;
 	private Platform lastPlat=null;
 	private Platform ridingPlat=null;
-    public Person(Level lev){
-    	level = lev;
-    	direction = level.getDir();
-    	movingStuff = new BufferedImage(level.getWidth(), level.getHeight(),  BufferedImage.TYPE_BYTE_INDEXED);
-    	g2 = movingStuff.createGraphics();
+    public Person(){
+    	scale=1;
     	xVel=0;
     	yVel=0;
     	jumpVel=11;
     	propelVel=12;
     	bounceVel=20;
     	breathReset=10000;
+    	breathCount=breathReset;
     	headAngle=90;
     	walkCount=0;
     	picStall=0;
     	makePics();
-    	levelSizeX= level.getWidth();
-    	levelSizeY= level.getHeight();
+    	
     	slideCoefficient=0.5;
     	iceCoefficient=0.1;
     	clingCoefficient=0.05;
+    	
+    	
+    }
+    public void setLevel(Level lev){
+    	level=lev;
+    	levelSizeX= level.getWidth();
+    	levelSizeY= level.getHeight();
     	checkPointX = level.getDropx();
     	checkPointY = level.getDropy();
+    	direction = level.getDir();
+    	movingStuff = new BufferedImage(level.getWidth(), level.getHeight(),  BufferedImage.TYPE_BYTE_INDEXED);
+    	g2 = movingStuff.createGraphics();
     	checkPointDir = direction;
+    	
     }
     public void setX(int dropx){
     	x = dropx;
@@ -222,6 +231,9 @@ public class Person {
    	public boolean getPCling(){
    		return clingPlat;
    	}
+   	public boolean getLevelDone(){
+   		return levelDone;
+   	}
    	public boolean reachedApex(){
    		return hitApex;
    	}
@@ -246,7 +258,11 @@ public class Person {
     public boolean gethasKey(){
     	return hasKey;
     }
+    public double getScale(){
+    	return scale;
+    }
     public Image getPic(){
+    	
     	if (isSwimming==true&&isSinking==false){
     		if (stopSwim>0){
 	    		picStall+=1;
@@ -934,7 +950,7 @@ public class Person {
 		Color cSm = new Color (movingStuff.getRGB(x+rotatedPoints[i][0],y+rotatedPoints[i][1]));
 		if (cS.equals(Color.RED)==true||cSm.equals(Color.RED)==true){
 			//System.out.println("death by trap");
-			die();		//death by trap
+			//die();		//death by trap
 			return 0;
 		}
 		else{
@@ -1004,9 +1020,10 @@ public class Person {
 		if (tempX>=0&&tempX<=levelSizeX&&tempY>=0&&tempY<=levelSizeY){
 			Color c = new Color (map.getRGB(tempX,tempY));
 			Color cM = new Color (movingStuff.getRGB(tempX,tempY));
+			
 			if (c.equals(Color.RED)==true||cM.equals(Color.RED)==true){
 				System.out.println("TRAP-DEATH");
-				die();		//death by trap (spike)
+			//	die();		//death by trap (spike)
 			}
 			else{
     			WallHits[i]=c.equals(GREY);
@@ -1054,7 +1071,7 @@ public class Person {
 					if (xVel<0&&isSwimming==false&&clingPlat==false){
 						if ((i==1||i==3||i==7)&&WallHits[i]==true){
 							adjust(x, tempY, -1, 14, "x", map);
-							System.out.println("ADJUSTL");
+						//	System.out.println("ADJUSTL");
 							runIntoWall=true;
 							lastPlat=null;
 							isBouncing=false;
@@ -1064,7 +1081,7 @@ public class Person {
 					if (xVel>0&&isSwimming==false&&clingPlat==false){
 						if ((i==2||i==5||i==8)&&WallHits[i]==true){
 							adjust(x, tempY, 1, -14, "x", map);
-							System.out.println("ADJUSTR");
+						//	System.out.println("ADJUSTR");
 							runIntoWall=true;
 							lastPlat=null;
 							isBouncing=false;
@@ -1161,86 +1178,96 @@ public class Person {
 		pushedPlat=false;
 		death=false;
 		
+		Color cD = new Color (map.getRGB(x,y));
+		if (cD.equals(PURPLE)==true){
+			levelDone=true;
+		}
 		
-		platCheckStuff();
-		//System.out.println(clingPlat);
-		//System.out.println("APLAT"+yVel);
-    	int waterWallhitCount=0;
-    	for (int i=0;i<9;i++){
-			waterHits[i]=0;
-			wallHitinWater[i]=false;
-		} 
-
-    	for (int i=0;i<9;i++){
-    		int tempX,tempY;
-    		if(x+rotatedPoints[i][0] <= levelSizeX && x+rotatedPoints[i][0] >=0 && y+rotatedPoints[i][1] <= levelSizeY && y+rotatedPoints[i][1] >=0){
-				for (int j=0;j<level.getCheckPoints().size();j++){
-    				checkCPoint(map,i,j);
-    			}
-    			for (int n=0;n<level.getkeyPoints().size();n++){
-    				checkKPoint(map,i,n);
-    			}
-				if (isSwimming==true){
-					if (breathCount==0){
-						breathCount=breathReset;
-						
-						die();
-					}
-					breathCount-=1;
-					fallCount=0;
-					isBouncing=false;
-					waterWallhitCount=swimCheckStuff(i, waterWallhitCount, map);
-				}
-					
+		//if (levelDone=false){
+			platCheckStuff();
+			//System.out.println(clingPlat);
+			//System.out.println("APLAT"+yVel);
+	    	int waterWallhitCount=0;
+	    	for (int i=0;i<9;i++){
+				waterHits[i]=0;
+				wallHitinWater[i]=false;
+			} 
 	
-	    		if (isSwimming==false){
-	    			otherCheckStuff(i, map);
-	    			
+	    	for (int i=0;i<9;i++){
+	    		int tempX,tempY;
+	    		if(x+rotatedPoints[i][0] <= levelSizeX && x+rotatedPoints[i][0] >=0 && y+rotatedPoints[i][1] <= levelSizeY && y+rotatedPoints[i][1] >=0){
+					for (int j=0;j<level.getCheckPoints().size();j++){
+	    				checkCPoint(map,i,j);
+	    			}
+	    			for (int n=0;n<level.getkeyPoints().size();n++){
+	    				checkKPoint(map,i,n);
+	    			}
+					if (isSwimming==true){
+						if (breathCount==0){
+							breathCount=breathReset;
+							
+							die();
+						}
+						breathCount-=1;
+						fallCount=0;
+						isBouncing=false;
+						waterWallhitCount=swimCheckStuff(i, waterWallhitCount, map);
+					}
+						
+		
+		    		if (isSwimming==false){
+		    			otherCheckStuff(i, map);
+		    			
+		    		}
+	
 	    		}
-
-    		}
-    		
-    		else{
-    			System.out.println("death by being out of bounds (in water)");
-    			die();	//death by being out of bounds (in water)
-    		}
-    	}
-    	if (clingPlat==true){
-    	//	System.out.println("DER");
-    		runIntoWall=true;
-    	}
-    	g2.dispose();
-
-    	
-    	if ((WallHits[0]==true||MovingStuffHits[0]==true)&&(WallHits[6]==true||MovingStuffHits[6]==true)){//amy waz here
-    		System.out.println("death by squishing");
-    		die();	//death by squishing between two platforms (vertical)
-    	}
-    	if (WallHits[1]==false&&WallHits[2]==false&&WallHits[3]==false&&WallHits[5]==false&&WallHits[7]==false&&WallHits[8]==false&&clingPlat==false){
-    		//System.out.println("NOT-CLINGG");
-    		isClinging=false;
-    	}
-    	else{
-    		if (inAir==true&&isSwimming==false&&footColor.equals(BLUE)==false){
-    		//	System.out.println("CLINGG");
-				cling(map);
-			}
-    	}
-    	if (waterWallhitCount>=2){
-    		//System.out.println("2");
-
-    		if ((wallHitinWater[2]==true||wallHitinWater[5]==true||wallHitinWater[8]==true)&&(wallHitinWater[6]==true||wallHitinWater[7]==true)){
-    		//	System.out.println("2 CORNER");
-    			x+=-3*direction;
-    			if (y+rotatedPoints[8][1]<=y){
-    				y-=3;
-    			}
-    		}
-    	}
-    	//System.out.println(x);
-    	//System.out.println(runIntoWall);
+	    		
+	    		else{
+	    			System.out.println("death by being out of bounds (in water)");
+	    			die();	//death by being out of bounds (in water)
+	    		}
+	    	}
+	    	if (clingPlat==true){
+	    	//	System.out.println("DER");
+	    		runIntoWall=true;
+	    	}
+	    	g2.dispose();
+	
+	    	
+	    	if ((WallHits[0]==true||MovingStuffHits[0]==true)&&(WallHits[6]==true||MovingStuffHits[6]==true)){//amy waz here
+	    		System.out.println("death by squishing");
+	    		die();	//death by squishing between two platforms (vertical)
+	    	}
+	    	if (WallHits[1]==false&&WallHits[2]==false&&WallHits[3]==false&&WallHits[5]==false&&WallHits[7]==false&&WallHits[8]==false&&clingPlat==false){
+	    		//System.out.println("NOT-CLINGG");
+	    		isClinging=false;
+	    	}
+	    	else{
+	    		if (inAir==true&&isSwimming==false&&footColor.equals(BLUE)==false){
+	    		//	System.out.println("CLINGG");
+					cling(map);
+				}
+	    	}
+	    	if (waterWallhitCount>=2){
+	    		//System.out.println("2");
+	
+	    		if ((wallHitinWater[2]==true||wallHitinWater[5]==true||wallHitinWater[8]==true)&&(wallHitinWater[6]==true||wallHitinWater[7]==true)){
+	    		//	System.out.println("2 CORNER");
+	    			x+=-3*direction;
+	    			if (y+rotatedPoints[8][1]<=y){
+	    				y-=3;
+	    			}
+	    		}
+	    	}
+	    	//System.out.println(x);
+	    	//System.out.println(runIntoWall);
+	//	}
     }
     public void die(){
+    	if (hasKey==true){
+    		level.getkeyAvailable().set(keyNum,true);
+    		hasKey=false;
+    	}
     	death=true;
    		deathCount++;
    		int lastCheck=-1;
@@ -1290,6 +1317,24 @@ public class Person {
     	fallCount=0;
     	level.iceRegen();
     }
+    public void suck(){
+    	scale-=0.005;
+    	scale=Math.max(0,scale);
+    	if (x>level.getEP()[0]){
+			x-=1;
+		}
+		else if (x<level.getEP()[0]){
+			x+=1;
+		}
+		if (y>level.getEP()[1]){
+			y-=1;
+		}
+		else if (y<level.getEP()[1]){
+			y+=1;
+		}
+		headAngle=(headAngle+1*direction)%360;
+		
+    }
     public void checkCPoint(BufferedImage map, int i, int j){
     	ArrayList<int[]> checkPoints = level.getCheckPoints();
     	if ((new Color(map.getRGB(x+contactPoints[i][0],y+contactPoints[i][1]))).equals(Color.BLACK)){
@@ -1307,6 +1352,7 @@ public class Person {
     		if (level.getkeyAvailable().get(n)== true&&hasKey==false){
     			level.setkeyGot(n);
     			hasKey=true;
+    			keyNum=n;
     		}
     	}
     }
